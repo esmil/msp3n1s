@@ -47,7 +47,7 @@ all: $(NAME).elf
 %.elf: %.c
 	@echo '  CC/LD $@'
 	@$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
-	@$(SIZE) -A $@ | $(SED) -e '/^\./!d;/^\.debug/d;s/^\([^0-9]*[0-9]*\).*/  \1 bytes/'
+	@$(SIZE) $@ | $(SED) -ne '2s/[\t ]*[0-9]*[\t ]*[0-9]*[\t ]*[0-9]*[\t ]*\([0-9]*\).*/  \1 bytes/p'
 
 %.lss: %.elf
 	@echo '  OBJDUMP > $@'

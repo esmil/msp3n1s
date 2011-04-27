@@ -18,6 +18,7 @@ MCU = msp430x2231
 #MCU = msp430x2211
 DRIVER = rf2500
 CFLAGS = -O2 -g -mmcu=$(MCU) -Wall -Wextra -pedantic
+# -ffunction-sections -fdata-sections
 
 ifdef BASE
 CFLAGS += -iquote$(BASE) -I$(BASE)/headers
@@ -49,11 +50,15 @@ all: $(NAME).elf
 	@$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 	@$(SIZE) $@ | $(SED) -ne '2s/[\t ]*[0-9]*[\t ]*[0-9]*[\t ]*[0-9]*[\t ]*\([0-9]*\).*/  \1 bytes/p'
 
+%.lst: %.elf
+	@echo '  OBJDUMP > $@'
+	@$(OBJDUMP) -S $< > $@
+
 %.lss: %.elf
 	@echo '  OBJDUMP > $@'
 	@$(OBJDUMP) -ld $< | $(SED) -e '/\/.*/d' > $@
 
-list: $(NAME).lss
+list: $(NAME).lst $(NAME).lss
 
 upload: $(NAME).elf
 	@$(MSPDEBUG) $(DRIVER) erase 'load $<'
@@ -72,6 +77,6 @@ cat: $(PORT)
 	@$(CAT) $(PORT)
 
 clean:
-	rm -f *.elf *.lss
+	rm -f *.elf *.lss *.lst
 
 # vim: syntax=make

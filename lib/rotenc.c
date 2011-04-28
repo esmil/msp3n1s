@@ -26,7 +26,7 @@
 #error "RIGHT button not defined"
 #endif
 
-static volatile enum {
+enum rotenc_state {
 	RS_ER,
 	RS_L1,
 	RS_L2,
@@ -38,18 +38,18 @@ static volatile enum {
 	RS_XL,
 	RS_XR,
 	RS_MAX = RS_XL
-} rotenc_state = RS_OK;
+};
 
 static const unsigned char rotenc_transition[RS_MAX][4] = {
-/*             00     01     10     11  */
-/* S_ER */ { RS_ER, RS_ER, RS_ER, RS_OK },
-/* S_L1 */ { RS_L2, RS_L1, RS_L3, RS_OK },
-/* S_L2 */ { RS_L2, RS_L1, RS_L3, RS_OK },
-/* S_L3 */ { RS_L2, RS_ER, RS_L3, RS_XL },
-/* S_R1 */ { RS_R2, RS_R3, RS_R1, RS_OK },
-/* S_R2 */ { RS_R2, RS_R3, RS_R1, RS_OK },
-/* S_R3 */ { RS_R2, RS_R3, RS_ER, RS_XR },
-/* S_OK */ { RS_ER, RS_L1, RS_R1, RS_OK }
+/*              00     01     10     11  */
+/* RS_ER */ { RS_ER, RS_ER, RS_ER, RS_OK },
+/* RS_L1 */ { RS_L2, RS_L1, RS_L3, RS_OK },
+/* RS_L2 */ { RS_L2, RS_L1, RS_L3, RS_OK },
+/* RS_L3 */ { RS_L2, RS_ER, RS_L3, RS_XL },
+/* RS_R1 */ { RS_R2, RS_R3, RS_R1, RS_OK },
+/* RS_R2 */ { RS_R2, RS_R3, RS_R1, RS_OK },
+/* RS_R3 */ { RS_R2, RS_R3, RS_ER, RS_XR },
+/* RS_OK */ { RS_ER, RS_L1, RS_R1, RS_OK }
 };
 
 enum rotenc_event {
@@ -61,6 +61,7 @@ enum rotenc_event {
 static enum rotenc_event
 rotenc_getevent()
 {
+	static enum rotenc_state state = RS_OK;
 	int ret;
 
 	do {
@@ -72,11 +73,11 @@ rotenc_getevent()
 		if (pin_is_high(RIGHT))
 			pins |= 2;
 
-		rotenc_state = rotenc_transition[rotenc_state][pins];
-	} while (rotenc_state < RS_OK);
+		state = rotenc_transition[state][pins];
+	} while (state < RS_OK);
 
-	ret = rotenc_state - RS_OK;
-	rotenc_state = RS_OK;
+	ret = state - RS_OK;
+	state = RS_OK;
 
 	return ret;
 }

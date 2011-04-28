@@ -32,7 +32,7 @@
 
 watchdog_interrupt()
 {
-	watchdog_timer_interrupt_enable();
+	watchdog_timer_interrupt_disable();
 	watchdog_timer_interrupt_clear();
 	watchdog_off();
 

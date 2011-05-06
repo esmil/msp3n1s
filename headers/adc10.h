@@ -19,6 +19,8 @@
 #ifndef _ADC10_H
 #define _ADC10_H
 
+#include <io.h>
+
 static inline void
 adc10_reference_neg_external() { ADC10CTL0 |= SREF2; }
 static inline void

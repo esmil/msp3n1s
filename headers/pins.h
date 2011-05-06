@@ -161,45 +161,43 @@ pin_function_secondary(double pin)
 	int n = (int)(10*pin);
 
 	switch (n) {
+#ifdef P1SEL2_
 	case 10: case 11: case 12: case 13:
 	case 14: case 15: case 16: case 17:
 		P1SEL |= 1 << (n % 10);
-#ifdef P1SEL2_
 		P1SEL2 |= 1 << (n % 10);
-#endif
 		break;
+#endif
+#ifdef P2SEL2_
 	case 20: case 21: case 22: case 23:
 	case 24: case 25: case 26: case 27:
 		P2SEL |= 1 << (n % 10);
-#ifdef P2SEL2_
 		P2SEL2 |= 1 << (n % 10);
-#endif
 		break;
+#endif
 	}
 }
-#endif
 
-#if defined(P1SEL2_) || defined(P2SEL2_)
 static inline __attribute__((always_inline)) void
 pin_function_oscillator(double pin)
 {
 	int n = (int)(10*pin);
 
 	switch (n) {
+#ifdef P1SEL2_
 	case 10: case 11: case 12: case 13:
 	case 14: case 15: case 16: case 17:
 		P1SEL &= ~(1 << (n % 10));
-#ifdef P1SEL2_
 		P1SEL2 |= 1 << (n % 10);
-#endif
 		break;
+#endif
+#ifdef P2SEL2_
 	case 20: case 21: case 22: case 23:
 	case 24: case 25: case 26: case 27:
 		P2SEL &= ~(1 << (n % 10));
-#ifdef P2SEL2_
 		P2SEL2 |= 1 << (n % 10);
-#endif
 		break;
+#endif
 	}
 }
 #endif

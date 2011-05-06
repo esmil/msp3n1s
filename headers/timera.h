@@ -19,6 +19,8 @@
 #ifndef _TIMERA_H
 #define _TIMERA_H
 
+#include <io.h>
+
 static inline void
 timera_clock_source_taclk()
 {

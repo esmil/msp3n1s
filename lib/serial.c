@@ -17,7 +17,7 @@
  */
 
 #include <signal.h>
-#include <timer_a.h>
+#include <timera.h>
 #include <stdarg.h>
 
 #define TX   1.1
@@ -28,9 +28,9 @@
 
 static volatile unsigned int serial_txbyte;
 
-timer_a_cc0_interrupt()
+timera_cc0_interrupt()
 {
-	timer_a_cc0_add(BITTIME);     /* add offset */
+	timera_cc0_add(BITTIME);     /* add offset */
 
 	if (serial_txbyte == 0) { /* all bits sent, wake up */
 		LPM0_EXIT;
@@ -54,12 +54,12 @@ serial__char(unsigned char c)
 static __attribute__((unused)) void
 serial_putchar(unsigned char c)
 {
-	timer_a_cc0_set(timer_a_count() + 16);
-	timer_a_cc0_interrupt_enable();
+	timera_cc0_set(timera_count() + 16);
+	timera_cc0_interrupt_enable();
 
 	serial__char(c);
 
-	timer_a_cc0_interrupt_disable();
+	timera_cc0_interrupt_disable();
 }
 
 static __attribute__((unused)) void
@@ -74,12 +74,12 @@ serial__string(const char *p)
 static __attribute__((unused)) void
 serial_puts(const char *p)
 {
-	timer_a_cc0_set(timer_a_count() + 16);
-	timer_a_cc0_interrupt_enable();
+	timera_cc0_set(timera_count() + 16);
+	timera_cc0_interrupt_enable();
 
 	serial__string(p);
 
-	timer_a_cc0_interrupt_disable();
+	timera_cc0_interrupt_disable();
 }
 
 static __attribute__((unused)) void
@@ -125,8 +125,8 @@ serial_dump(const void *buf, unsigned int len)
 {
 	const unsigned char *p = buf;
 
-	timer_a_cc0_set(timer_a_count() + 16);
-	timer_a_cc0_interrupt_enable();
+	timera_cc0_set(timera_count() + 16);
+	timera_cc0_interrupt_enable();
 
 	for (; len > 0; len--) {
 		int c = *p++;
@@ -137,7 +137,7 @@ serial_dump(const void *buf, unsigned int len)
 
 	serial__char('\n');
 
-	timer_a_cc0_interrupt_disable();
+	timera_cc0_interrupt_disable();
 }
 
 static __attribute__((unused)) void
@@ -159,8 +159,8 @@ serial_printf(const char *fmt, ...)
 
 	va_start(ap, fmt);
 
-	timer_a_cc0_set(timer_a_count() + 16);
-	timer_a_cc0_interrupt_enable();
+	timera_cc0_set(timera_count() + 16);
+	timera_cc0_interrupt_enable();
 
 	for (c = *fmt++; c != '\0'; c = *fmt++) {
 		if (c != '%') {
@@ -198,7 +198,7 @@ serial_printf(const char *fmt, ...)
 	}
 out:
 	va_end(ap);
-	timer_a_cc0_interrupt_disable();
+	timera_cc0_interrupt_disable();
 }
 
 static void
@@ -209,12 +209,12 @@ serial_init()
 	pin_function_primary(TX);
 	pin_function_primary(RX);
 
-	timer_a_cc0_output_high(); /* set TX high when idle */
+	timera_cc0_output_high(); /* set TX high when idle */
 
-	timer_a_clock_source_smclk();
-	timer_a_clock_divide(1);
-	timer_a_cc0_output_mode(1);
-	timer_a_mode_continuous();
+	timera_clock_source_smclk();
+	timera_clock_divide(1);
+	timera_cc0_output_mode(1);
+	timera_mode_continuous();
 }
 
 #undef TX

@@ -53,14 +53,14 @@ watchdog_interrupt()
 	pin_interrupt_enable(S2); /* debouncing complete */
 }
 
-timer_a_cc1_interrupt()
+timera_cc1_interrupt()
 {
-	timer_a_cc1_add(BLINKTIME);
+	timera_cc1_add(BLINKTIME);
 
 	pin_toggle(LED1);
 	pin_toggle(LED2);
 
-	timer_a_cc1_interrupt_clear();
+	timera_cc1_interrupt_clear();
 }
 
 int
@@ -88,8 +88,8 @@ main()
 	/* start blinking */
 	pin_high(LED1);
 	pin_low(LED2);
-	timer_a_cc1_set(timer_a_count() + BLINKTIME);
-	timer_a_cc1_interrupt_enable();
+	timera_cc1_set(timera_count() + BLINKTIME);
+	timera_cc1_interrupt_enable();
 
 	while (1) {
 		LPM0; /* wait for button press */

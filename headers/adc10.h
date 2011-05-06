@@ -139,7 +139,7 @@ adc10_sample_and_hold_source_software()
 }
 
 static inline void
-adc10_sample_and_hold_source_timer_a_out0()
+adc10_sample_and_hold_source_timera_out0()
 {
 #ifdef ATOMIC
 	ADC10CTL1 = (ADC10CTL1 & ~SHS1) | SHS0;
@@ -150,7 +150,7 @@ adc10_sample_and_hold_source_timer_a_out0()
 }
 
 static inline void
-adc10_sample_and_hold_source_timer_a_out1()
+adc10_sample_and_hold_source_timera_out1()
 {
 #ifdef ATOMIC
 	ADC10CTL1 = (ADC10CTL1 & ~SHS0) | SHS1;
@@ -161,7 +161,7 @@ adc10_sample_and_hold_source_timer_a_out1()
 }
 
 static inline void
-adc10_sample_and_hold_source_timer_a_out2()
+adc10_sample_and_hold_source_timera_out2()
 {
 	ADC10CTL1 |= SHS1 | SHS0;
 }

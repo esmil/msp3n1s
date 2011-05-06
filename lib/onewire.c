@@ -17,7 +17,7 @@
  */
 
 #include <pins.h>
-#include <timer_a.h>
+#include <timera.h>
 #include <delay.h>
 
 static inline void

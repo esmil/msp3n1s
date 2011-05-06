@@ -88,9 +88,9 @@ adc10_sample_and_hold_clocks(unsigned int n)
 }
 
 static inline void
-adc10_sampling_rate_50ksps()     { ADC10CTL0 |= ADC10SR; }
+adc10_sample_rate_50ksps()       { ADC10CTL0 |= ADC10SR; }
 static inline void
-adc10_sampling_rate_200ksps()    { ADC10CTL0 &= ~ADC10SR; }
+adc10_sample_rate_200ksps()      { ADC10CTL0 &= ~ADC10SR; }
 static inline void
 adc10_reference_output_enable()  { ADC10CTL0 |= REFOUT; }
 static inline void

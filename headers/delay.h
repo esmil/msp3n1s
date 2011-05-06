@@ -16,6 +16,9 @@
  * along with msp3n1s.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef _DELAY_H
+#define _DELAY_H
+
 /* delay routine from mspgcc help file
  * this takes 3*n + 1 cycles */
 static inline void
@@ -45,3 +48,5 @@ delay_cycles(unsigned int n)
 	case 2: nop();
 	}
 }
+
+#endif

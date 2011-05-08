@@ -149,7 +149,7 @@ timera_count()             { return TAR; }
 	static inline void\
 	timera_capture##n##_mode_falling() { TACCTL##n |= CM1; TACCTL##n &= ~CM0; }\
 	static inline void\
-	timoer_a_capture##n##_mode_both()   { TACCTL##n |= CM1 | CM0; }\
+	timera_capture##n##_mode_both()    { TACCTL##n |= CM1 | CM0; }\
 	static inline void\
 	timera_cc##n##_mode_capture()      { TACCTL##n |= CAP; }\
 	static inline void\
@@ -163,7 +163,7 @@ timera_count()             { return TAR; }
 	static inline void\
 	timera_cc##n##_output_high()       { TACCTL##n |= OUT; }\
 	static inline void\
-	timera_cc##n##_output_low()       { TACCTL##n &= ~OUT; }\
+	timera_cc##n##_output_low()        { TACCTL##n &= ~OUT; }\
 	static inline int\
 	timera_capture##n##_overflow()     { return TACCTL##n & COV; }\
 	static inline void\

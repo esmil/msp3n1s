@@ -85,7 +85,7 @@ timera_clock_divide(unsigned int n)
 }
 
 static inline void
-timera_stop()
+timera_off()
 {
 	TACTL &= ~(MC1 | MC0);
 }
@@ -143,13 +143,23 @@ timera_count()             { return TAR; }
 	static inline unsigned int\
 	timera_cc##n()                     { return TACCR##n; }\
 	static inline void\
-	timera_capture##n##_mode_none()    { TACCTL##n &= ~(CM1 | CM0); }\
+	timera_cc##n##_capture_none()      { TACCTL##n &= ~(CM1 | CM0); }\
 	static inline void\
-	timera_capture##n##_mode_rising()  { TACCTL##n &= ~CM1; TACCTL##n |= CM0; }\
+	timera_cc##n##_capture_rising()    { TACCTL##n &= ~CM1; TACCTL##n |= CM0; }\
 	static inline void\
-	timera_capture##n##_mode_falling() { TACCTL##n |= CM1; TACCTL##n &= ~CM0; }\
+	timera_cc##n##_capture_falling()   { TACCTL##n |= CM1; TACCTL##n &= ~CM0; }\
 	static inline void\
-	timera_capture##n##_mode_both()    { TACCTL##n |= CM1 | CM0; }\
+	timera_cc##n##_capture_both()      { TACCTL##n |= CM1 | CM0; }\
+	static inline void\
+	timera_cc##n##_input_a()        { TACCTL##n &= ~(CCIS1 | CCIS0); }\
+	static inline void\
+	timera_cc##n##_input_b()        { TACCTL##n &= ~CCIS1; TACCTL##n |= CCIS0; }\
+	static inline void\
+	timera_cc##n##_input_gnd()      { TACCTL##n |= CCIS1; TACCTL##n &= ~CCIS0; }\
+	static inline void\
+	timera_cc##n##_input_vcc()      { TACCTL##n |= CCIS1 | CCIS0; }\
+	static inline void\
+	timera_cc##n##_capture()        { TACCTL##n ^= CCIS0; }\
 	static inline void\
 	timera_cc##n##_mode_capture()      { TACCTL##n |= CAP; }\
 	static inline void\
@@ -165,7 +175,7 @@ timera_count()             { return TAR; }
 	static inline void\
 	timera_cc##n##_output_low()        { TACCTL##n &= ~OUT; }\
 	static inline int\
-	timera_capture##n##_overflow()     { return TACCTL##n & COV; }\
+	timera_cc##n##_capture_overflow()  { return TACCTL##n & COV; }\
 	static inline void\
 	timera_cc##n##_interrupt_raise()   { TACCTL##n |= CCIFG; }\
 	static inline void\

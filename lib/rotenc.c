@@ -61,8 +61,7 @@ enum rotenc_event {
 static enum rotenc_event
 rotenc_getevent()
 {
-	static enum rotenc_state state = RS_OK;
-	int ret;
+	enum rotenc_state state = RS_OK;
 
 	do {
 		unsigned int pins = 0;
@@ -76,8 +75,5 @@ rotenc_getevent()
 		state = rotenc_transition[state][pins];
 	} while (state < RS_OK);
 
-	ret = state - RS_OK;
-	state = RS_OK;
-
-	return ret;
+	return state - RS_OK;
 }

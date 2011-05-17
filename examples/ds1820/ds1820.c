@@ -32,28 +32,20 @@
 #define ONEWIRE_INTERNAL_PULLUP
 #include "lib/onewire.c"
 
-static int
-dtemp_convert(unsigned char rom[8])
+static void
+dtemp__convert()
 {
-	if (onewire_rom_match(rom))
-		return -1;
-
 	/* transmit convert temperature command */
 	onewire_transmit_8bit(0x44);
 
 	/* wait for conversion to complete */
 	while (onewire_receive_1bit() == 0);
-
-	return 0;
 }
 
 static int
-dtemp_scratchpad_read(unsigned char rom[8], unsigned char scratchpad[9])
+dtemp__scratchpad_read(unsigned char scratchpad[9])
 {
 	int i;
-
-	if (onewire_rom_match(rom))
-		return -1;
 
 	/* transmit read scratchpad command */
 	onewire_transmit_8bit(0xBE);
@@ -62,7 +54,35 @@ dtemp_scratchpad_read(unsigned char rom[8], unsigned char scratchpad[9])
 	for (i = 0; i < 9; i++)
 		scratchpad[i] = onewire_receive_8bit();
 
-	return 0;
+	return onewire_crc_8bit(scratchpad, 9);
+}
+
+static int __attribute__((unused))
+dtemp_convert(unsigned char rom[8], unsigned char scratchpad[9])
+{
+	if (onewire_rom_match(rom))
+		return -1;
+
+	dtemp__convert();
+
+	if (onewire_rom_match(rom))
+		return -1;
+
+	return dtemp__scratchpad_read(scratchpad);
+}
+
+static int __attribute__((unused))
+dtemp_convert_single(unsigned char scratchpad[9])
+{
+	if (onewire_rom_skip())
+		return -1;
+
+	dtemp__convert();
+
+	if (onewire_rom_skip())
+		return -1;
+
+	return dtemp__scratchpad_read(scratchpad);
 }
 
 port1_interrupt()
@@ -94,26 +114,15 @@ main()
 	eint();
 
 	while (1) {
-		unsigned char rom[8];
 		unsigned char scratchpad[9];
 		int val;
 
 		LPM0;
 
-		pin_high(LED1);
-		if (onewire_rom_read(rom))
-			goto error;
-		pin_low(LED1);
-
 		pin_high(LED2);
-		if (dtemp_convert(rom))
+		if (dtemp_convert_single(scratchpad))
 			goto error;
 		pin_low(LED2);
-
-		pin_high(LED1);
-		if (dtemp_scratchpad_read(rom, scratchpad))
-			goto error;
-		pin_low(LED1);
 
 		val = (scratchpad[1] << 8) | scratchpad[0];
 
@@ -123,6 +132,9 @@ main()
 		*/
 
 		serial_printf("Read %d.%d C\n", val / 2, (val & 1) ? 5 : 0);
+		serial_printf("..or %d - 0.25 + %d/%d C\n", val / 2,
+		              (int)(scratchpad[7] - scratchpad[6]),
+			      (int)scratchpad[7]);
 		continue;
 
 error:

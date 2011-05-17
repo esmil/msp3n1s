@@ -20,6 +20,30 @@
 #include <timera.h>
 #include <delay.h>
 
+static unsigned char __attribute__((unused))
+onewire_crc_8bit(const unsigned char message[], int len)
+{
+
+	unsigned char crc = 0;
+	int byte;
+
+	for (byte = 0; byte < len; byte++) {
+		unsigned char c = message[byte];
+		int i;
+
+		for (i = 0; i < 8; i++) {
+			if ((crc ^ c) & 1)
+				crc = (crc >> 1) ^ 0x8C;
+			else
+				crc >>= 1;
+
+			c >>= 1;
+		}
+	}
+
+	return crc;
+}
+
 static inline void
 onewire_pin_low()
 {

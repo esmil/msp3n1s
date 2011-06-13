@@ -19,7 +19,7 @@
 #ifndef _CLOCK_H
 #define _CLOCK_H
 
-#include <io.h>
+#include <msp430.h>
 
 static inline void
 clock_init_1MHz(void)

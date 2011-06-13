@@ -16,7 +16,6 @@
  * along with msp3n1s.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <signal.h>
 #include <timera.h>
 #include <stdarg.h>
 
@@ -28,6 +27,7 @@
 
 static volatile unsigned int serial_txbyte;
 
+static void
 timera_cc0_interrupt(void)
 {
 	timera_cc0_add(BITTIME);     /* add offset */

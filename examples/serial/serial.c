@@ -16,7 +16,6 @@
  * along with msp3n1s.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <signal.h>
 #include <clock.h>
 #include <pins.h>
 #include <watchdog.h>
@@ -32,6 +31,7 @@
 
 #define BLINKTIME 0xFFFF
 
+static void
 port1_interrupt(void)
 {
 	pin_interrupt_disable(S2); /* debounce */
@@ -44,6 +44,7 @@ port1_interrupt(void)
 	LPM0_EXIT;
 }
 
+static void
 watchdog_interrupt(void)
 {
 	watchdog_timer_interrupt_disable();
@@ -53,6 +54,7 @@ watchdog_interrupt(void)
 	pin_interrupt_enable(S2); /* debouncing complete */
 }
 
+static void
 timera_cc1_interrupt(void)
 {
 	timera_cc1_add(BLINKTIME);
@@ -83,7 +85,7 @@ main(void)
 	serial_init();
 
 	/* enable interrupts */
-	eint();
+	__eint();
 
 	/* start blinking */
 	pin_high(LED1);

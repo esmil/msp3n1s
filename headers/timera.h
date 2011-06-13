@@ -19,7 +19,7 @@
 #ifndef _TIMERA_H
 #define _TIMERA_H
 
-#include <io.h>
+#include <msp430.h>
 
 static inline void
 timera_clock_source_taclk(void)
@@ -187,9 +187,12 @@ timera_count(void)             { return TAR; }
 define_capture_compare(0)
 define_capture_compare(1)
 
-#define timera_interrupt(x...)     interrupt(TIMERA1_VECTOR) timera_interrupt(void)
-#define timera_cc0_interrupt(x...) interrupt(TIMERA0_VECTOR) timera_cc0_interrupt(void)
-#define timera_cc1_interrupt(x...) interrupt(TIMERA1_VECTOR) timera_cc1_interrupt(void)
+#define timera_interrupt(x...) __attribute__((interrupt(TIMERA1_VECTOR)))\
+	timera_interrupt(x)
+#define timera_cc0_interrupt(x...) __attribute__((interrupt(TIMERA0_VECTOR)))\
+	timera_cc0_interrupt(x)
+#define timera_cc1_interrupt(x...) __attribute__((interrupt(TIMERA1_VECTOR)))\
+	timera_cc1_interrupt(x)
 
 #undef define_capture_compare
 #endif

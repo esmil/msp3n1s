@@ -19,7 +19,7 @@
 #ifndef _PINS_H
 #define _PINS_H
 
-#include <io.h>
+#include <msp430.h>
 
 #define define_pin_set(name, on, off) \
 	static inline __attribute__((always_inline)) void\
@@ -205,8 +205,10 @@ pin_function_oscillator(double pin)
 define_port(1)
 define_port(2)
 
-#define port1_interrupt(x...) interrupt(PORT1_VECTOR) port1_interrupt(void)
-#define port2_interrupt(x...) interrupt(PORT2_VECTOR) port2_interrupt(void)
+#define port1_interrupt(x...) __attribute__((interrupt(PORT1_VECTOR)))\
+	port1_interrupt(x)
+#define port2_interrupt(x...) __attribute__((interrupt(PORT2_VECTOR)))\
+	port2_interrupt(x)
 
 #undef define_pin_set
 #undef define_pin_read

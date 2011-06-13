@@ -19,7 +19,7 @@
 #ifndef _ADC10_H
 #define _ADC10_H
 
-#include <io.h>
+#include <msp430.h>
 
 static inline void
 adc10_reference_neg_external(void) { ADC10CTL0 |= SREF2; }
@@ -265,6 +265,7 @@ adc10_transfer_block1(void)          { return ADC10DTC0 & ADC10B1; }
 static inline int
 adc10_transfer_block2(void)          { return !(ADC10DTC0 & ADC10B1); }
 
-#define adc10_interrupt(x...) interrupt(ADC10_VECTOR) adc10_interrupt(void)
+#define adc10_interrupt(x...) __attribute__((interrupt(ADC10_VECTOR)))\
+	adc10_interrupt(x)
 
 #endif

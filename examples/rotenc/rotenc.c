@@ -16,7 +16,6 @@
  * along with msp3n1s.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <signal.h>
 #include <watchdog.h>
 #include <clock.h>
 #include <pins.h>
@@ -30,6 +29,7 @@
 
 #include "lib/rotenc.c"
 
+static void
 watchdog_interrupt(void)
 {
 	watchdog_timer_interrupt_disable();
@@ -47,6 +47,7 @@ blink(void)
 	watchdog_timer_interrupt_enable();
 }
 
+static void
 port1_interrupt(void)
 {
 	port1_interrupts_clear();
@@ -85,7 +86,7 @@ main(void)
 	pin_interrupt_falling(S2);
 
 	/* enable interrupts */
-	eint();
+	__eint();
 
 	while (1) {
 		LPM0;

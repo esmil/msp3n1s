@@ -16,7 +16,6 @@
  * along with msp3n1s.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <signal.h>
 #include <clock.h>
 #include <watchdog.h>
 #include <pins.h>
@@ -85,6 +84,7 @@ dtemp_convert_single(unsigned char scratchpad[9])
 	return dtemp__scratchpad_read(scratchpad);
 }
 
+static void
 port1_interrupt(void)
 {
 	pin_interrupt_clear(S2);
@@ -111,7 +111,7 @@ main(void)
 	onewire_init();
 	serial_init();
 
-	eint();
+	__eint();
 
 	while (1) {
 		unsigned char scratchpad[9];

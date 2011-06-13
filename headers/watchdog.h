@@ -19,7 +19,7 @@
 #ifndef _WATCHDOG_H
 #define _WATCHDOG_H
 
-#include <io.h>
+#include <msp430.h>
 
 static inline void
 watchdog_timer_hold(void)         { WDTCTL |= WDTHOLD; }
@@ -132,6 +132,7 @@ watchdog_mode_0_5ms(void)   { WDTCTL = WDT_MRST_0_5; }
 static inline void
 watchdog_mode_0_064ms(void) { WDTCTL = WDT_MRST_0_064; }
 
-#define watchdog_interrupt(x...) interrupt(WDT_VECTOR) watchdog_interrupt(void)
+#define watchdog_interrupt(x...) __attribute__((interrupt(WDT_VECTOR)))\
+	watchdog_interrupt(x)
 
 #endif

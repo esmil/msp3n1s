@@ -16,7 +16,7 @@
  * along with msp3n1s.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <io.h>
+#include <msp430.h>
 
 static inline void
 delay(register unsigned int n)

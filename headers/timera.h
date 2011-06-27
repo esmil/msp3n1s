@@ -22,13 +22,13 @@
 #include <io.h>
 
 static inline void
-timera_clock_source_taclk()
+timera_clock_source_taclk(void)
 {
 	TACTL &= ~(TASSEL1 | TASSEL0);
 }
 
 static inline void
-timera_clock_source_aclk()
+timera_clock_source_aclk(void)
 {
 #ifdef ATOMIC
 	TACTL = (TACTL & ~TASSEL1) | TASSEL0;
@@ -39,7 +39,7 @@ timera_clock_source_aclk()
 }
 
 static inline void
-timera_clock_source_smclk()
+timera_clock_source_smclk(void)
 {
 #ifdef ATOMIC
 	TACTL = (TACTL & ~TASSEL0) | TASSEL1;
@@ -50,7 +50,7 @@ timera_clock_source_smclk()
 }
 
 static inline void
-timera_clock_source_inclk()
+timera_clock_source_inclk(void)
 {
 	TACTL |= TASSEL1 | TASSEL0;
 }
@@ -85,13 +85,13 @@ timera_clock_divide(unsigned int n)
 }
 
 static inline void
-timera_off()
+timera_off(void)
 {
 	TACTL &= ~(MC1 | MC0);
 }
 
 static inline void
-timera_mode_up()
+timera_mode_up(void)
 {
 #ifdef ATOMIC
 	TACTL = (TACTL & ~MC1) | MC0;
@@ -102,7 +102,7 @@ timera_mode_up()
 }
 
 static inline void
-timera_mode_continuous()
+timera_mode_continuous(void)
 {
 #ifdef ATOMIC
 	TACTL = (TACTL & ~MC0) | MC1;
@@ -113,73 +113,73 @@ timera_mode_continuous()
 }
 
 static inline void
-timera_mode_updown()
+timera_mode_updown(void)
 {
 	TACTL |= MC1 | MC0;
 }
 
 static inline void
-timera_clear()             { TACTL |= TACLR; }
+timera_clear(void)             { TACTL |= TACLR; }
 static inline void
-timera_interrupt_enable()  { TACTL |= TAIE; }
+timera_interrupt_enable(void)  { TACTL |= TAIE; }
 static inline void
-timera_interrupt_disable() { TACTL &= ~TAIE; }
+timera_interrupt_disable(void) { TACTL &= ~TAIE; }
 static inline int
-timera_interrupt_enabled() { return TACTL & TAIE; }
+timera_interrupt_enabled(void) { return TACTL & TAIE; }
 static inline void
-timera_interrupt_raise()   { TACTL |= TAIFG; }
+timera_interrupt_raise(void)   { TACTL |= TAIFG; }
 static inline void
-timera_interrupt_clear()   { TACTL &= ~TAIFG; }
+timera_interrupt_clear(void)   { TACTL &= ~TAIFG; }
 static inline int
-timera_interrupt_flag()    { return TACTL & TAIFG; }
+timera_interrupt_flag(void)    { return TACTL & TAIFG; }
 static inline unsigned int
-timera_count()             { return TAR; }
+timera_count(void)             { return TAR; }
 
 #define define_capture_compare(n)\
 	static inline void\
-	timera_cc##n##_set(unsigned int v) { TACCR##n = v; }\
+	timera_cc##n##_set(unsigned int v)     { TACCR##n = v; }\
 	static inline void\
-	timera_cc##n##_add(unsigned int v) { TACCR##n += v; }\
+	timera_cc##n##_add(unsigned int v)     { TACCR##n += v; }\
 	static inline unsigned int\
-	timera_cc##n()                     { return TACCR##n; }\
+	timera_cc##n(void)                     { return TACCR##n; }\
 	static inline void\
-	timera_cc##n##_capture_none()      { TACCTL##n &= ~(CM1 | CM0); }\
+	timera_cc##n##_capture_none(void)      { TACCTL##n &= ~(CM1 | CM0); }\
 	static inline void\
-	timera_cc##n##_capture_rising()    { TACCTL##n &= ~CM1; TACCTL##n |= CM0; }\
+	timera_cc##n##_capture_rising(void)    { TACCTL##n &= ~CM1; TACCTL##n |= CM0; }\
 	static inline void\
-	timera_cc##n##_capture_falling()   { TACCTL##n |= CM1; TACCTL##n &= ~CM0; }\
+	timera_cc##n##_capture_falling(void)   { TACCTL##n |= CM1; TACCTL##n &= ~CM0; }\
 	static inline void\
-	timera_cc##n##_capture_both()      { TACCTL##n |= CM1 | CM0; }\
+	timera_cc##n##_capture_both(void)      { TACCTL##n |= CM1 | CM0; }\
 	static inline void\
-	timera_cc##n##_input_a()        { TACCTL##n &= ~(CCIS1 | CCIS0); }\
+	timera_cc##n##_input_a(void)           { TACCTL##n &= ~(CCIS1 | CCIS0); }\
 	static inline void\
-	timera_cc##n##_input_b()        { TACCTL##n &= ~CCIS1; TACCTL##n |= CCIS0; }\
+	timera_cc##n##_input_b(void)           { TACCTL##n &= ~CCIS1; TACCTL##n |= CCIS0; }\
 	static inline void\
-	timera_cc##n##_input_gnd()      { TACCTL##n |= CCIS1; TACCTL##n &= ~CCIS0; }\
+	timera_cc##n##_input_gnd(void)         { TACCTL##n |= CCIS1; TACCTL##n &= ~CCIS0; }\
 	static inline void\
-	timera_cc##n##_input_vcc()      { TACCTL##n |= CCIS1 | CCIS0; }\
+	timera_cc##n##_input_vcc(void)         { TACCTL##n |= CCIS1 | CCIS0; }\
 	static inline void\
-	timera_cc##n##_capture()        { TACCTL##n ^= CCIS0; }\
+	timera_cc##n##_capture(void)           { TACCTL##n ^= CCIS0; }\
 	static inline void\
-	timera_cc##n##_mode_capture()      { TACCTL##n |= CAP; }\
+	timera_cc##n##_mode_capture(void)      { TACCTL##n |= CAP; }\
 	static inline void\
-	timera_cc##n##_mode_compare()      { TACCTL##n &= ~CAP; }\
+	timera_cc##n##_mode_compare(void)      { TACCTL##n &= ~CAP; }\
 	static inline void\
-	timera_cc##n##_interrupt_enable()  { TACCTL##n |= CCIE; }\
+	timera_cc##n##_interrupt_enable(void)  { TACCTL##n |= CCIE; }\
 	static inline void\
-	timera_cc##n##_interrupt_disable() { TACCTL##n &= ~CCIE; }\
+	timera_cc##n##_interrupt_disable(void) { TACCTL##n &= ~CCIE; }\
 	static inline int\
-	timera_cc##n##_interrupt_enabled() { return TACCTL##n & CCIE; }\
+	timera_cc##n##_interrupt_enabled(void) { return TACCTL##n & CCIE; }\
 	static inline void\
-	timera_cc##n##_output_high()       { TACCTL##n |= OUT; }\
+	timera_cc##n##_output_high(void)       { TACCTL##n |= OUT; }\
 	static inline void\
-	timera_cc##n##_output_low()        { TACCTL##n &= ~OUT; }\
+	timera_cc##n##_output_low(void)        { TACCTL##n &= ~OUT; }\
 	static inline int\
-	timera_cc##n##_capture_overflow()  { return TACCTL##n & COV; }\
+	timera_cc##n##_capture_overflow(void)  { return TACCTL##n & COV; }\
 	static inline void\
-	timera_cc##n##_interrupt_raise()   { TACCTL##n |= CCIFG; }\
+	timera_cc##n##_interrupt_raise(void)   { TACCTL##n |= CCIFG; }\
 	static inline void\
-	timera_cc##n##_interrupt_clear()   { TACCTL##n &= ~CCIFG; }\
+	timera_cc##n##_interrupt_clear(void)   { TACCTL##n &= ~CCIFG; }\
 	static inline void\
 	timera_cc##n##_output_mode(unsigned int mode)\
 	{ TACCTL##n |= mode << 5; }
@@ -187,9 +187,9 @@ timera_count()             { return TAR; }
 define_capture_compare(0)
 define_capture_compare(1)
 
-#define timera_interrupt()     interrupt(TIMERA1_VECTOR) timera_interrupt()
-#define timera_cc0_interrupt() interrupt(TIMERA0_VECTOR) timera_cc0_interrupt()
-#define timera_cc1_interrupt() interrupt(TIMERA1_VECTOR) timera_cc1_interrupt()
+#define timera_interrupt(x...)     interrupt(TIMERA1_VECTOR) timera_interrupt(void)
+#define timera_cc0_interrupt(x...) interrupt(TIMERA0_VECTOR) timera_cc0_interrupt(void)
+#define timera_cc1_interrupt(x...) interrupt(TIMERA1_VECTOR) timera_cc1_interrupt(void)
 
 #undef define_capture_compare
 #endif

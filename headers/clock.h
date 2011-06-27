@@ -22,27 +22,27 @@
 #include <io.h>
 
 static inline void
-clock_init_1MHz()
+clock_init_1MHz(void)
 {
 	BCSCTL1 = CALBC1_1MHZ;
 	DCOCTL  = CALDCO_1MHZ;
 }
 
 static inline void
-clock_mclk_1MHz()
+clock_mclk_1MHz(void)
 {
 	BCSCTL1 = (BCSCTL1 & ~(RSEL3 | RSEL2 | RSEL1 | RSEL0)) | CALBC1_1MHZ;
 	DCOCTL  = CALDCO_1MHZ;
 }
 
 static inline void
-clock_xt2_off()              { BCSCTL1 |= XT2OFF; }
+clock_xt2_off(void)              { BCSCTL1 |= XT2OFF; }
 static inline void
-clock_xt2_on()               { BCSCTL1 &= ~XT2OFF; }
+clock_xt2_on(void)               { BCSCTL1 &= ~XT2OFF; }
 static inline void
-clock_lfxt1_mode_high_freq() { BCSCTL1 |= XTS; }
+clock_lfxt1_mode_high_freq(void) { BCSCTL1 |= XTS; }
 static inline void
-clock_lfxt1_mode_low_freq()  { BCSCTL1 &= ~XTS; }
+clock_lfxt1_mode_low_freq(void)  { BCSCTL1 &= ~XTS; }
 
 static inline void
 clock_aclk_divide(unsigned int n)
@@ -77,13 +77,13 @@ clock_aclk_divide(unsigned int n)
 }
 
 static inline void
-clock_mclk_source_dco()   { BCSCTL2 &= ~(SELM1 | SELM0); }
+clock_mclk_source_dco(void)   { BCSCTL2 &= ~(SELM1 | SELM0); }
 static inline void
-clock_mclk_source_xt2()   { BCSCTL2 = (BCSCTL2 & ~SELM0) | SELM0; }
+clock_mclk_source_xt2(void)   { BCSCTL2 = (BCSCTL2 & ~SELM0) | SELM0; }
 static inline void
-clock_mclk_source_lfxt1() { BCSCTL2 |= SELM1 | SELM0; }
+clock_mclk_source_lfxt1(void) { BCSCTL2 |= SELM1 | SELM0; }
 static inline void
-clock_mclk_source_vlo()   { BCSCTL2 |= SELM1 | SELM0; }
+clock_mclk_source_vlo(void)   { BCSCTL2 |= SELM1 | SELM0; }
 
 static inline void
 clock_mclk_divide(unsigned int n)
@@ -118,11 +118,11 @@ clock_mclk_divide(unsigned int n)
 }
 
 static inline void
-clock_smclk_source_lfxt1() { BCSCTL2 |= SELS; }
+clock_smclk_source_lfxt1(void) { BCSCTL2 |= SELS; }
 static inline void
-clock_smclk_source_vlo()   { BCSCTL2 |= SELS; }
+clock_smclk_source_vlo(void)   { BCSCTL2 |= SELS; }
 static inline void
-clock_smclk_source_dco()   { BCSCTL2 &= ~SELS; }
+clock_smclk_source_dco(void)   { BCSCTL2 &= ~SELS; }
 
 static inline void
 clock_smclk_divide(unsigned int n)
@@ -158,18 +158,18 @@ clock_smclk_divide(unsigned int n)
 
 #ifdef DCOR
 static inline void
-clock_dco_resistor_external() { BCSCTL2 |= DCOR; }
+clock_dco_resistor_external(void) { BCSCTL2 |= DCOR; }
 static inline void
-clock_dco_resistor_internal() { BCSCTL2 &= ~DCOR; }
+clock_dco_resistor_internal(void) { BCSCTL2 &= ~DCOR; }
 #endif
 
 static inline void
-clock_xt2_range_0_4_to_1MHz() { BCSCTL3 &= ~(XT2S1 | XT2S0); }
+clock_xt2_range_0_4_to_1MHz(void) { BCSCTL3 &= ~(XT2S1 | XT2S0); }
 static inline void
-clock_xt2_range_1_to_3MHz()   { BCSCTL3 = (BCSCTL3 & ~XT2S1) | XT2S0; }
+clock_xt2_range_1_to_3MHz(void)   { BCSCTL3 = (BCSCTL3 & ~XT2S1) | XT2S0; }
 static inline void
-clock_xt2_range_3_to_16MHz()  { BCSCTL3 = (BCSCTL3 & ~XT2S0) | XT2S1; }
+clock_xt2_range_3_to_16MHz(void)  { BCSCTL3 = (BCSCTL3 & ~XT2S0) | XT2S1; }
 static inline void
-clock_xt2_digital()           { BCSCTL3 |= XT2S0 | XT2S1; }
+clock_xt2_digital(void)           { BCSCTL3 |= XT2S0 | XT2S1; }
 
 #endif

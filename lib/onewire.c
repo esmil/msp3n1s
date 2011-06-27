@@ -45,7 +45,7 @@ onewire_crc_8bit(const unsigned char message[], int len)
 }
 
 static inline void
-onewire_pin_low()
+onewire_pin_low(void)
 {
 	pin_mode_output(ONEWIRE_PIN);
 #ifdef ONEWIRE_INTERNAL_PULLUP
@@ -54,7 +54,7 @@ onewire_pin_low()
 }
 
 static inline void
-onewire_pin_release()
+onewire_pin_release(void)
 {
 #ifdef ONEWIRE_INTERNAL_PULLUP
 	pin_high(ONEWIRE_PIN); /* enable internal pull-up */
@@ -63,7 +63,7 @@ onewire_pin_release()
 }
 
 static void
-onewire_init()
+onewire_init(void)
 {
 #ifdef ONEWIRE_INTERNAL_PULLUP
 	pin_resistor_enable(ONEWIRE_PIN);
@@ -75,7 +75,7 @@ onewire_init()
 }
 
 static int
-onewire_reset()
+onewire_reset(void)
 {
 	onewire_pin_low();
 
@@ -124,7 +124,7 @@ onewire_transmit_8bit(unsigned int byte)
 }
 
 static int
-onewire_receive_1bit()
+onewire_receive_1bit(void)
 {
 	int ret;
 
@@ -141,7 +141,7 @@ onewire_receive_1bit()
 }
 
 static int
-onewire_receive_8bit()
+onewire_receive_8bit(void)
 {
 	int byte = 0;
 	unsigned int mask;
@@ -196,7 +196,7 @@ onewire_rom_match(const unsigned char rom[8])
 }
 
 static int __attribute__((unused))
-onewire_rom_skip()
+onewire_rom_skip(void)
 {
 	if (onewire_reset())
 		return -1;

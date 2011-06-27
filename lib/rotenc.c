@@ -59,7 +59,7 @@ enum rotenc_event {
 };
 
 static enum rotenc_event
-rotenc_getevent()
+rotenc_getevent(void)
 {
 	enum rotenc_state state = RS_OK;
 

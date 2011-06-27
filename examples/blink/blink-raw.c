@@ -29,7 +29,7 @@ delay(register unsigned int n)
 }
 
 int
-main()
+main(void)
 {
 	P1DIR |= 1 << 0;
 

@@ -23,7 +23,7 @@
 #define LED2 1.6
 
 int
-main()
+main(void)
 {
 	pin_mode_output(LED1);
 

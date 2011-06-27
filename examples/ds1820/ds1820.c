@@ -33,7 +33,7 @@
 #include "lib/onewire.c"
 
 static void
-dtemp__convert()
+dtemp__convert(void)
 {
 	/* transmit convert temperature command */
 	onewire_transmit_8bit(0x44);
@@ -85,14 +85,14 @@ dtemp_convert_single(unsigned char scratchpad[9])
 	return dtemp__scratchpad_read(scratchpad);
 }
 
-port1_interrupt()
+port1_interrupt(void)
 {
 	pin_interrupt_clear(S2);
 	LPM0_EXIT;
 }
 
 int
-main()
+main(void)
 {
 	watchdog_off();
 	clock_init_1MHz();

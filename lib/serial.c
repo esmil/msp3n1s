@@ -28,7 +28,7 @@
 
 static volatile unsigned int serial_txbyte;
 
-timera_cc0_interrupt()
+timera_cc0_interrupt(void)
 {
 	timera_cc0_add(BITTIME);     /* add offset */
 
@@ -202,7 +202,7 @@ out:
 }
 
 static void
-serial_init()
+serial_init(void)
 {
 	pin_mode_output(TX);
 	pin_mode_input(RX);

@@ -32,7 +32,7 @@
 
 #define BLINKTIME 0xFFFF
 
-port1_interrupt()
+port1_interrupt(void)
 {
 	pin_interrupt_disable(S2); /* debounce */
 	pin_interrupt_clear(S2);
@@ -44,7 +44,7 @@ port1_interrupt()
 	LPM0_EXIT;
 }
 
-watchdog_interrupt()
+watchdog_interrupt(void)
 {
 	watchdog_timer_interrupt_disable();
 	watchdog_timer_interrupt_clear();
@@ -53,7 +53,7 @@ watchdog_interrupt()
 	pin_interrupt_enable(S2); /* debouncing complete */
 }
 
-timera_cc1_interrupt()
+timera_cc1_interrupt(void)
 {
 	timera_cc1_add(BLINKTIME);
 
@@ -64,7 +64,7 @@ timera_cc1_interrupt()
 }
 
 int
-main()
+main(void)
 {
 	watchdog_off();
 	clock_init_1MHz();

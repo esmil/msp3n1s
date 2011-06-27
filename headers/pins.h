@@ -75,11 +75,11 @@
 	static inline __attribute__((always_inline)) void\
 	port##n##_clearbits(unsigned char v)     { P##n##OUT &= ~v; }\
 	static inline __attribute__((always_inline)) unsigned char\
-	port##n##_get()                          { return P##n##IN; }\
+	port##n##_get(void)                      { return P##n##IN; }\
 	static inline __attribute__((always_inline)) void\
-	port##n##_interrupts_raise()             { P##n##IFG = 0xFF; }\
+	port##n##_interrupts_raise(void)         { P##n##IFG = 0xFF; }\
 	static inline __attribute__((always_inline)) void\
-	port##n##_interrupts_clear()             { P##n##IFG = 0x00; }
+	port##n##_interrupts_clear(void)         { P##n##IFG = 0x00; }
 
 define_pin_set(DIR, mode_output, mode_input)
 define_pin_set(REN, resistor_enable, resistor_disable)
@@ -205,8 +205,8 @@ pin_function_oscillator(double pin)
 define_port(1)
 define_port(2)
 
-#define port1_interrupt() interrupt(PORT1_VECTOR) port1_interrupt()
-#define port2_interrupt() interrupt(PORT2_VECTOR) port2_interrupt()
+#define port1_interrupt(x...) interrupt(PORT1_VECTOR) port1_interrupt(void)
+#define port2_interrupt(x...) interrupt(PORT2_VECTOR) port2_interrupt(void)
 
 #undef define_pin_set
 #undef define_pin_read

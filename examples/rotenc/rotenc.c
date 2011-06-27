@@ -30,7 +30,7 @@
 
 #include "lib/rotenc.c"
 
-watchdog_interrupt()
+watchdog_interrupt(void)
 {
 	watchdog_timer_interrupt_disable();
 	watchdog_timer_interrupt_clear();
@@ -41,20 +41,20 @@ watchdog_interrupt()
 }
 
 static void
-blink()
+blink(void)
 {
 	watchdog_timer_32ms();
 	watchdog_timer_interrupt_enable();
 }
 
-port1_interrupt()
+port1_interrupt(void)
 {
 	port1_interrupts_clear();
 	LPM0_EXIT;
 }
 
 int
-main()
+main(void)
 {
 	watchdog_off();
 	clock_init_1MHz();

@@ -16,6 +16,7 @@
  * along with msp3n1s.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <watchdog.h>
 #include <pins.h>
 #include <delay.h>
 
@@ -25,6 +26,7 @@
 int
 main(void)
 {
+	watchdog_off();
 	pin_mode_output(LED1);
 
 	while (1) {

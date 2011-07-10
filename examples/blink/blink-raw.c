@@ -31,12 +31,14 @@ delay(register unsigned int n)
 int
 main(void)
 {
-	P1DIR |= 1 << 0;
+	WDTCTL = WDTPW | WDTHOLD; /* watchdog_off();       */
+	P1DIR |= BIT0;            /* pin_mode_output(1.0); */
 
 	while (1) {
-		P1OUT |= BIT0;
+		P1OUT |= BIT0;  /* pin_high(1.0); */
 		delay(0xFFFF);
-		P1OUT &= ~BIT0;
+
+		P1OUT &= ~BIT0; /* pin_low(1.0);  */
 		delay(0xFFFF);
 	}
 }

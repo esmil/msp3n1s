@@ -35,17 +35,17 @@ static inline void
 delay_cycles(unsigned int n)
 {
 	switch (n) {
-	case 3: nop();
-	case 2: nop();
-	case 1: nop();
+	case 3: __nop();
+	case 2: __nop();
+	case 1: __nop();
 	case 0: return;
 	}
 
 	delay((n-1)/3);
 
 	switch (n % 3) {
-	case 0: nop();
-	case 2: nop();
+	case 0: __nop();
+	case 2: __nop();
 	}
 }
 

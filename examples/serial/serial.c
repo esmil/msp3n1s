@@ -16,9 +16,9 @@
  * along with msp3n1s.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <watchdog.h>
 #include <clock.h>
 #include <pins.h>
-#include <watchdog.h>
 
 #define LED1 1.0
 #define LED2 1.6

@@ -17,7 +17,7 @@ STTY = stty
 MCU = msp430g2231
 #MCU = msp430g2211
 DRIVER = rf2500
-CFLAGS = -O2 -g -mmcu=$(MCU) -Wall -Wextra -Wno-variadic-macros -pedantic
+CFLAGS = -std=gnu99 -mmcu=$(MCU) -O2 -pipe -g -Wall -Wextra -Wno-variadic-macros -pedantic
 # -ffunction-sections -fdata-sections
 
 ifdef BASE

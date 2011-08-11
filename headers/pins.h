@@ -20,6 +20,7 @@
 #define _PINS_H
 
 #include <msp430.h>
+#include <macros.h>
 
 #define define_pin_set(name, on, off) \
 	static inline __attribute__((always_inline)) void\
@@ -29,10 +30,10 @@
 		switch (n) {\
 		case 10: case 11: case 12: case 13:\
 		case 14: case 15: case 16: case 17:\
-			P1##name |= 1 << (n % 10); break;\
+			__bis_b(1 << (n % 10), P1##name); break;\
 		case 20: case 21: case 22: case 23:\
 		case 24: case 25: case 26: case 27:\
-			P2##name |= 1 << (n % 10); break;\
+			__bis_b(1 << (n % 10), P2##name); break;\
 		}\
 	}\
 	static inline __attribute__((always_inline)) void\
@@ -42,10 +43,10 @@
 		switch (n) {\
 		case 10: case 11: case 12: case 13:\
 		case 14: case 15: case 16: case 17:\
-			P1##name &= ~(1 << (n % 10)); break;\
+			__bic_b(1 << (n % 10), P1##name); break;\
 		case 20: case 21: case 22: case 23:\
 		case 24: case 25: case 26: case 27:\
-			P2##name &= ~(1 << (n % 10)); break;\
+			__bic_b(1 << (n % 10), P2##name); break;\
 		}\
 	}
 
@@ -116,16 +117,16 @@ pin_function_io(double pin)
 	switch (n) {
 	case 10: case 11: case 12: case 13:
 	case 14: case 15: case 16: case 17:
-		P1SEL &= ~(1 << (n % 10));
+		__bic_b(1 << (n % 10), P1SEL);
 #ifdef P1SEL2_
-		P1SEL2 &= ~(1 << (n % 10));
+		__bic_b(1 << (n % 10), P1SEL2);
 #endif
 		break;
 	case 20: case 21: case 22: case 23:
 	case 24: case 25: case 26: case 27:
-		P2SEL &= ~(1 << (n % 10));
+		__bic_b(1 << (n % 10), P2SEL);
 #ifdef P2SEL2_
-		P2SEL2 &= ~(1 << (n % 10));
+		__bic_b(1 << (n % 10), P2SEL2);
 #endif
 		break;
 	}
@@ -139,16 +140,16 @@ pin_function_primary(double pin)
 	switch (n) {
 	case 10: case 11: case 12: case 13:
 	case 14: case 15: case 16: case 17:
-		P1SEL |= 1 << (n % 10);
+		__bis_b(1 << (n % 10), P1SEL);
 #ifdef P1SEL2_
-		P1SEL2 &= ~(1 << (n % 10));
+		__bic_b(1 << (n % 10), P1SEL2);
 #endif
 		break;
 	case 20: case 21: case 22: case 23:
 	case 24: case 25: case 26: case 27:
-		P2SEL |= 1 << (n % 10);
+		__bis_b(1 << (n % 10), P2SEL);
 #ifdef P2SEL2_
-		P2SEL2 &= ~(1 << (n % 10));
+		__bic_b(1 << (n % 10), P2SEL2);
 #endif
 		break;
 	}
@@ -164,15 +165,15 @@ pin_function_secondary(double pin)
 #ifdef P1SEL2_
 	case 10: case 11: case 12: case 13:
 	case 14: case 15: case 16: case 17:
-		P1SEL |= 1 << (n % 10);
-		P1SEL2 |= 1 << (n % 10);
+		__bis_b(1 << (n % 10), P1SEL);
+		__bis_b(1 << (n % 10), P1SEL2);
 		break;
 #endif
 #ifdef P2SEL2_
 	case 20: case 21: case 22: case 23:
 	case 24: case 25: case 26: case 27:
-		P2SEL |= 1 << (n % 10);
-		P2SEL2 |= 1 << (n % 10);
+		__bis_b(1 << (n % 10), P2SEL);
+		__bis_b(1 << (n % 10), P2SEL2);
 		break;
 #endif
 	}
@@ -187,15 +188,15 @@ pin_function_oscillator(double pin)
 #ifdef P1SEL2_
 	case 10: case 11: case 12: case 13:
 	case 14: case 15: case 16: case 17:
-		P1SEL &= ~(1 << (n % 10));
-		P1SEL2 |= 1 << (n % 10);
+		__bic_b(1 << (n % 10), P1SEL);
+		__bis_b(1 << (n % 10), P1SEL2);
 		break;
 #endif
 #ifdef P2SEL2_
 	case 20: case 21: case 22: case 23:
 	case 24: case 25: case 26: case 27:
-		P2SEL &= ~(1 << (n % 10));
-		P2SEL2 |= 1 << (n % 10);
+		__bic_b(1 << (n % 10), P2SEL);
+		__bis_b(1 << (n % 10), P2SEL2);
 		break;
 #endif
 	}

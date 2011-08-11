@@ -20,6 +20,7 @@
 #define _CLOCK_H
 
 #include <msp430.h>
+#include <macros.h>
 
 static inline void
 clock_init_1MHz(void)
@@ -36,28 +37,28 @@ clock_mclk_1MHz(void)
 }
 
 static inline void
-clock_xt2_off(void)              { BCSCTL1 |= XT2OFF; }
+clock_xt2_off(void)              { __bis_b(XT2OFF, BCSCTL1); }
 static inline void
-clock_xt2_on(void)               { BCSCTL1 &= ~XT2OFF; }
+clock_xt2_on(void)               { __bic_b(XT2OFF, BCSCTL1); }
 static inline void
-clock_lfxt1_mode_high_freq(void) { BCSCTL1 |= XTS; }
+clock_lfxt1_mode_high_freq(void) { __bis_b(XTS, BCSCTL1); }
 static inline void
-clock_lfxt1_mode_low_freq(void)  { BCSCTL1 &= ~XTS; }
+clock_lfxt1_mode_low_freq(void)  { __bic_b(XTS, BCSCTL1); }
 
 static inline void
 clock_aclk_divide(unsigned int n)
 {
 	switch (n) {
 	case 1:
-		BCSCTL1 &= ~(DIVA1 | DIVA0);
+		__bic_b(DIVA1 | DIVA0, BCSCTL1);
 		break;
 
 	case 2:
 #ifdef ATOMIC
 		BCSCTL1 = (BCSCTL1 & ~DIVA1) | DIVA0;
 #else
-		BCSCTL1 &= ~DIVA1;
-		BCSCTL1 |= DIVA0;
+		__bic_b(DIVA1, BCSCTL1);
+		__bis_b(DIVA0, BCSCTL1);
 #endif
 		break;
 
@@ -65,40 +66,40 @@ clock_aclk_divide(unsigned int n)
 #ifdef ATOMIC
 		BCSCTL1 = (BCSCTL1 & ~DIVA0) | DIVA1;
 #else
-		BCSCTL1 |= DIVA1;
-		BCSCTL1 &= ~DIVA0;
+		__bis_b(DIVA1, BCSCTL1);
+		__bic_b(DIVA0, BCSCTL1);
 #endif
 		break;
 
 	case 8:
-		BCSCTL1 |= DIVA1 | DIVA0;
+		__bis_b(DIVA1 | DIVA0, BCSCTL1);
 		break;
 	}
 }
 
 static inline void
-clock_mclk_source_dco(void)   { BCSCTL2 &= ~(SELM1 | SELM0); }
+clock_mclk_source_dco(void)   { __bic_b(SELM1 | SELM0, BCSCTL2); }
 static inline void
 clock_mclk_source_xt2(void)   { BCSCTL2 = (BCSCTL2 & ~SELM0) | SELM0; }
 static inline void
-clock_mclk_source_lfxt1(void) { BCSCTL2 |= SELM1 | SELM0; }
+clock_mclk_source_lfxt1(void) { __bis_b(SELM1 | SELM0, BCSCTL2); }
 static inline void
-clock_mclk_source_vlo(void)   { BCSCTL2 |= SELM1 | SELM0; }
+clock_mclk_source_vlo(void)   { __bis_b(SELM1 | SELM0, BCSCTL2); }
 
 static inline void
 clock_mclk_divide(unsigned int n)
 {
 	switch (n) {
 	case 1:
-		BCSCTL2 &= ~(DIVM1 | DIVM0);
+		__bic_b(DIVM1 | DIVM0, BCSCTL2);
 		break;
 
 	case 2:
 #ifdef ATOMIC
 		BCSCTL2 = (BCSCTL2 & ~DIVM1) | DIVM0;
 #else
-		BCSCTL2 &= ~DIVM1;
-		BCSCTL2 |= DIVM0;
+		__bic_b(DIVM1, BCSCTL2);
+		__bis_b(DIVM0, BCSCTL2);
 #endif
 		break;
 
@@ -106,38 +107,38 @@ clock_mclk_divide(unsigned int n)
 #ifdef ATOMIC
 		BCSCTL2 = (BCSCTL2 & ~DIVM0) | DIVM1;
 #else
-		BCSCTL2 |= DIVM1;
-		BCSCTL2 &= ~DIVM0;
+		__bis_b(DIVM1, BCSCTL2);
+		__bic_b(DIVM0, BCSCTL2);
 #endif
 		break;
 
 	case 8:
-		BCSCTL2 |= DIVM1 | DIVM0;
+		__bis_b(DIVM1 | DIVM0, BCSCTL2);
 		break;
 	}
 }
 
 static inline void
-clock_smclk_source_lfxt1(void) { BCSCTL2 |= SELS; }
+clock_smclk_source_lfxt1(void) { __bis_b(SELS, BCSCTL2); }
 static inline void
-clock_smclk_source_vlo(void)   { BCSCTL2 |= SELS; }
+clock_smclk_source_vlo(void)   { __bis_b(SELS, BCSCTL2); }
 static inline void
-clock_smclk_source_dco(void)   { BCSCTL2 &= ~SELS; }
+clock_smclk_source_dco(void)   { __bic_b(SELS, BCSCTL2); }
 
 static inline void
 clock_smclk_divide(unsigned int n)
 {
 	switch (n) {
 	case 1:
-		BCSCTL2 &= ~(DIVS1 | DIVS0);
+		__bic_b(DIVS1 | DIVS0, BCSCTL2);
 		break;
 
 	case 2:
 #ifdef ATOMIC
 		BCSCTL2 = (BCSCTL2 & ~DIVS1) | DIVS0;
 #else
-		BCSCTL2 &= ~DIVS1;
-		BCSCTL2 |= DIVS0;
+		__bic_b(DIVS1, BCSCTL2);
+		__bis_b(DIVS0, BCSCTL2);
 #endif
 		break;
 
@@ -145,31 +146,31 @@ clock_smclk_divide(unsigned int n)
 #ifdef ATOMIC
 		BCSCTL2 = (BCSCTL2 & ~DIVS0) | DIVS1;
 #else
-		BCSCTL2 |= DIVS1;
-		BCSCTL2 &= ~DIVS0;
+		__bis_b(DIVS1, BCSCTL2);
+		__bic_b(DIVS0, BCSCTL2);
 #endif
 		break;
 
 	case 8:
-		BCSCTL2 |= DIVS1 | DIVS0;
+		__bis_b(DIVS1 | DIVS0, BCSCTL2);
 		break;
 	}
 }
 
 #ifdef DCOR
 static inline void
-clock_dco_resistor_external(void) { BCSCTL2 |= DCOR; }
+clock_dco_resistor_external(void) { __bis_b(DCOR, BCSCTL2); }
 static inline void
-clock_dco_resistor_internal(void) { BCSCTL2 &= ~DCOR; }
+clock_dco_resistor_internal(void) { __bic_b(DCOR, BCSCTL2); }
 #endif
 
 static inline void
-clock_xt2_range_0_4_to_1MHz(void) { BCSCTL3 &= ~(XT2S1 | XT2S0); }
+clock_xt2_range_0_4_to_1MHz(void) { __bic_b(XT2S1 | XT2S0, BCSCTL3); }
 static inline void
 clock_xt2_range_1_to_3MHz(void)   { BCSCTL3 = (BCSCTL3 & ~XT2S1) | XT2S0; }
 static inline void
 clock_xt2_range_3_to_16MHz(void)  { BCSCTL3 = (BCSCTL3 & ~XT2S0) | XT2S1; }
 static inline void
-clock_xt2_digital(void)           { BCSCTL3 |= XT2S0 | XT2S1; }
+clock_xt2_digital(void)           { __bis_b(XT2S0 | XT2S1, BCSCTL3); }
 
 #endif

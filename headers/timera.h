@@ -20,11 +20,12 @@
 #define _TIMERA_H
 
 #include <msp430.h>
+#include <macros.h>
 
 static inline void
 timera_clock_source_taclk(void)
 {
-	TACTL &= ~(TASSEL1 | TASSEL0);
+	__bic_w(TASSEL1 | TASSEL0, TACTL);
 }
 
 static inline void
@@ -33,8 +34,8 @@ timera_clock_source_aclk(void)
 #ifdef ATOMIC
 	TACTL = (TACTL & ~TASSEL1) | TASSEL0;
 #else
-	TACTL &= ~TASSEL1;
-	TACTL |= TASSEL0;
+	__bic_w(TASSEL1, TACTL);
+	__bis_w(TASSEL0, TACTL);
 #endif
 }
 
@@ -44,15 +45,15 @@ timera_clock_source_smclk(void)
 #ifdef ATOMIC
 	TACTL = (TACTL & ~TASSEL0) | TASSEL1;
 #else
-	TACTL |= TASSEL1;
-	TACTL &= ~TASSEL0;
+	__bis_w(TASSEL1, TACTL);
+	__bic_w(TASSEL0, TACTL);
 #endif
 }
 
 static inline void
 timera_clock_source_inclk(void)
 {
-	TACTL |= TASSEL1 | TASSEL0;
+	__bis_w(TASSEL1 | TASSEL0, TACTL);
 }
 
 static inline void
@@ -60,26 +61,26 @@ timera_clock_divide(unsigned int n)
 {
 	switch (n) {
 	case 1:
-		TACTL &= ~(ID1 | ID0);
+		__bic_w(ID1 | ID0, TACTL);
 		break;
 	case 2:
 #ifdef ATOMIC
 		TACTL = (TACTL & ~ID1) | ID0;
 #else
-		TACTL &= ~ID1;
-		TACTL |= ID0;
+		__bic_w(ID1, TACTL);
+		__bis_w(ID0, TACTL);
 #endif
 		break;
 	case 4:
 #ifdef ATOMIC
 		TACTL = (TACTL & ~ID0) | ID1;
 #else
-		TACTL |= ID1;
-		TACTL &= ~ID0;
+		__bis_w(ID1, TACTL);
+		__bic_w(ID0, TACTL);
 #endif
 		break;
 	case 8:
-		TACTL |= ID1 | ID0;
+		__bis_w(ID1 | ID0, TACTL);
 		break;
 	}
 }
@@ -87,7 +88,7 @@ timera_clock_divide(unsigned int n)
 static inline void
 timera_off(void)
 {
-	TACTL &= ~(MC1 | MC0);
+	__bic_w(MC1 | MC0, TACTL);
 }
 
 static inline void
@@ -96,8 +97,8 @@ timera_mode_up(void)
 #ifdef ATOMIC
 	TACTL = (TACTL & ~MC1) | MC0;
 #else
-	TACTL &= ~MC1;
-	TACTL |= MC0;
+	__bic_w(MC1, TACTL);
+	__bis_w(MC0, TACTL);
 #endif
 }
 
@@ -107,29 +108,29 @@ timera_mode_continuous(void)
 #ifdef ATOMIC
 	TACTL = (TACTL & ~MC0) | MC1;
 #else
-	TACTL |= MC1;
-	TACTL &= ~MC0;
+	__bis_w(MC1, TACTL);
+	__bic_w(MC0, TACTL);
 #endif
 }
 
 static inline void
 timera_mode_updown(void)
 {
-	TACTL |= MC1 | MC0;
+	__bis_w(MC1 | MC0, TACTL);
 }
 
 static inline void
-timera_clear(void)             { TACTL |= TACLR; }
+timera_clear(void)             { __bis_w(TACLR, TACTL); }
 static inline void
-timera_interrupt_enable(void)  { TACTL |= TAIE; }
+timera_interrupt_enable(void)  { __bis_w(TAIE, TACTL); }
 static inline void
-timera_interrupt_disable(void) { TACTL &= ~TAIE; }
+timera_interrupt_disable(void) { __bic_w(TAIE, TACTL); }
 static inline int
 timera_interrupt_enabled(void) { return TACTL & TAIE; }
 static inline void
-timera_interrupt_raise(void)   { TACTL |= TAIFG; }
+timera_interrupt_raise(void)   { __bis_w(TAIFG, TACTL); }
 static inline void
-timera_interrupt_clear(void)   { TACTL &= ~TAIFG; }
+timera_interrupt_clear(void)   { __bic_w(TAIFG, TACTL); }
 static inline int
 timera_interrupt_flag(void)    { return TACTL & TAIFG; }
 static inline unsigned int
@@ -143,46 +144,46 @@ timera_count(void)             { return TAR; }
 	static inline unsigned int\
 	timera_cc##n(void)                     { return TACCR##n; }\
 	static inline void\
-	timera_cc##n##_capture_none(void)      { TACCTL##n &= ~(CM1 | CM0); }\
+	timera_cc##n##_capture_none(void)      { __bic_w(CM1 | CM0, TACCTL##n); }\
 	static inline void\
-	timera_cc##n##_capture_rising(void)    { TACCTL##n &= ~CM1; TACCTL##n |= CM0; }\
+	timera_cc##n##_capture_rising(void)    { __bic_w(CM1, TACCTL##n); __bis_w(CM0, TACCTL##n); }\
 	static inline void\
-	timera_cc##n##_capture_falling(void)   { TACCTL##n |= CM1; TACCTL##n &= ~CM0; }\
+	timera_cc##n##_capture_falling(void)   { __bis_w(CM1, TACCTL##n); __bic_w(CM0, TACCTL##n); }\
 	static inline void\
-	timera_cc##n##_capture_both(void)      { TACCTL##n |= CM1 | CM0; }\
+	timera_cc##n##_capture_both(void)      { __bis_w(CM1 | CM0, TACCTL##n); }\
 	static inline void\
-	timera_cc##n##_input_a(void)           { TACCTL##n &= ~(CCIS1 | CCIS0); }\
+	timera_cc##n##_input_a(void)           { __bic_w(CCIS1 | CCIS0, TACCTL##n); }\
 	static inline void\
-	timera_cc##n##_input_b(void)           { TACCTL##n &= ~CCIS1; TACCTL##n |= CCIS0; }\
+	timera_cc##n##_input_b(void)           { __bic_w(CCIS1, TACCTL##n); __bis_w(CCIS0, TACCTL##n); }\
 	static inline void\
-	timera_cc##n##_input_gnd(void)         { TACCTL##n |= CCIS1; TACCTL##n &= ~CCIS0; }\
+	timera_cc##n##_input_gnd(void)         { __bis_w(CCIS1, TACCTL##n); __bic_w(CCIS0, TACCTL##n); }\
 	static inline void\
-	timera_cc##n##_input_vcc(void)         { TACCTL##n |= CCIS1 | CCIS0; }\
+	timera_cc##n##_input_vcc(void)         { __bis_w(CCIS1 | CCIS0, TACCTL##n); }\
 	static inline void\
 	timera_cc##n##_capture(void)           { TACCTL##n ^= CCIS0; }\
 	static inline void\
-	timera_cc##n##_mode_capture(void)      { TACCTL##n |= CAP; }\
+	timera_cc##n##_mode_capture(void)      { __bis_w(CAP, TACCTL##n); }\
 	static inline void\
-	timera_cc##n##_mode_compare(void)      { TACCTL##n &= ~CAP; }\
+	timera_cc##n##_mode_compare(void)      { __bic_w(CAP, TACCTL##n); }\
 	static inline void\
-	timera_cc##n##_interrupt_enable(void)  { TACCTL##n |= CCIE; }\
+	timera_cc##n##_interrupt_enable(void)  { __bis_w(CCIE, TACCTL##n); }\
 	static inline void\
-	timera_cc##n##_interrupt_disable(void) { TACCTL##n &= ~CCIE; }\
+	timera_cc##n##_interrupt_disable(void) { __bic_w(CCIE, TACCTL##n); }\
 	static inline int\
 	timera_cc##n##_interrupt_enabled(void) { return TACCTL##n & CCIE; }\
 	static inline void\
-	timera_cc##n##_output_high(void)       { TACCTL##n |= OUT; }\
+	timera_cc##n##_output_high(void)       { __bis_w(OUT, TACCTL##n); }\
 	static inline void\
-	timera_cc##n##_output_low(void)        { TACCTL##n &= ~OUT; }\
+	timera_cc##n##_output_low(void)        { __bic_w(OUT, TACCTL##n); }\
 	static inline int\
 	timera_cc##n##_capture_overflow(void)  { return TACCTL##n & COV; }\
 	static inline void\
-	timera_cc##n##_interrupt_raise(void)   { TACCTL##n |= CCIFG; }\
+	timera_cc##n##_interrupt_raise(void)   { __bis_w(CCIFG, TACCTL##n); }\
 	static inline void\
-	timera_cc##n##_interrupt_clear(void)   { TACCTL##n &= ~CCIFG; }\
+	timera_cc##n##_interrupt_clear(void)   { __bic_w(CCIFG, TACCTL##n); }\
 	static inline void\
 	timera_cc##n##_output_mode(unsigned int mode)\
-	{ TACCTL##n |= mode << 5; }
+	{ __bis_w(mode << 5, TACCTL##n); }
 
 define_capture_compare(0)
 define_capture_compare(1)

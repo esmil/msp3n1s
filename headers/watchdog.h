@@ -20,6 +20,7 @@
 #define _WATCHDOG_H
 
 #include <msp430.h>
+#include <macros.h>
 
 static inline void
 watchdog_timer_hold(void)         { WDTCTL |= WDTHOLD; }
@@ -77,28 +78,28 @@ watchdog_timer_interval(unsigned int n)
 }
 
 static inline void
-watchdog_timer_interrupt_enable(void)  { IE1 |= WDTIE; }
+watchdog_timer_interrupt_enable(void)  { __bis_b(WDTIE, IE1); }
 static inline void
-watchdog_timer_interrupt_disable(void) { IE1 &= ~WDTIE; }
+watchdog_timer_interrupt_disable(void) { __bic_b(WDTIE, IE1); }
 static inline int
 watchdog_timer_interrupt_enabled(void) { return IE1 & WDTIE; }
 static inline void
-watchdog_nmi_interrupt_enable(void)    { IE1 |= NMIIE; }
+watchdog_nmi_interrupt_enable(void)    { __bis_b(NMIIE, IE1); }
 static inline void
-watchdog_nmi_interrupt_disable(void)   { IE1 &= ~NMIIE; }
+watchdog_nmi_interrupt_disable(void)   { __bic_b(NMIIE, IE1); }
 static inline int
 watchdog_nmi_interrupt_enabled(void)   { return IE1 & NMIIE; }
 
 static inline void
-watchdog_timer_interrupt_raise(void)   { IFG1 |= WDTIFG; }
+watchdog_timer_interrupt_raise(void)   { __bis_b(WDTIFG, IFG1); }
 static inline void
-watchdog_timer_interrupt_clear(void)   { IFG1 &= ~WDTIFG; }
+watchdog_timer_interrupt_clear(void)   { __bic_b(WDTIFG, IFG1); }
 static inline int
 watchdog_timer_interrupt_flag(void)    { return IFG1 & WDTIFG; }
 static inline void
-watchdog_nmi_interrupt_raise(void)     { IFG1 |= NMIIFG; }
+watchdog_nmi_interrupt_raise(void)     { __bis_b(NMIIFG, IFG1); }
 static inline void
-watchdog_nmi_interrupt_clear(void)     { IFG1 &= ~NMIIFG; }
+watchdog_nmi_interrupt_clear(void)     { __bic_b(NMIIFG, IFG1); }
 static inline int
 watchdog_nmi_interrupt_flag(void)      { return IFG1 & NMIIFG; }
 

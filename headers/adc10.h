@@ -20,16 +20,17 @@
 #define _ADC10_H
 
 #include <msp430.h>
+#include <macros.h>
 
 static inline void
-adc10_reference_neg_external(void) { ADC10CTL0 |= SREF2; }
+adc10_reference_neg_external(void) { __bis_w(SREF2, ADC10CTL0); }
 static inline void
-adc10_reference_neg_ground(void)   { ADC10CTL0 &= ~SREF2; }
+adc10_reference_neg_ground(void)   { __bic_w(SREF2, ADC10CTL0); }
 
 static inline void
 adc10_reference_pos_Vcc(void)
 {
-	ADC10CTL0 &= ~(SREF1 | SREF0);
+	__bic_w(SREF1 | SREF0, ADC10CTL0);
 }
 
 static inline void
@@ -38,8 +39,8 @@ adc10_reference_pos_Vref(void)
 #ifdef ATOMIC
 	ADC10CTL0 = (ADC10CTL0 & ~SREF1) | SREF0;
 #else
-	ADC10CTL0 &= ~SREF1;
-	ADC10CTL0 |= SREF0;
+	__bic_w(SREF1, ADC10CTL0);
+	__bis_w(SREF0, ADC10CTL0);
 #endif
 }
 
@@ -49,15 +50,15 @@ adc10_reference_pos_external(void)
 #ifdef ATOMIC
 	ADC10CTL0 = (ADC10CTL0 & ~SREF0) | SREF1;
 #else
-	ADC10CTL0 |= SREF1;
-	ADC10CTL0 &= ~SREF0;
+	__bis_w(SREF1, ADC10CTL0);
+	__bic_w(SREF0, ADC10CTL0);
 #endif
 }
 
 static inline void
 adc10_reference_pos_buffered(void)
 {
-	ADC10CTL0 |= SREF1 | SREF0;
+	__bis_w(SREF1 | SREF0, ADC10CTL0);
 }
 
 static inline void
@@ -65,79 +66,79 @@ adc10_sample_and_hold_clocks(unsigned int n)
 {
 	switch (n) {
 	case 4:
-		ADC10CTL0 &= ~(ADC10SHT1 | ADC10SHT0);
+		__bic_w(ADC10SHT1 | ADC10SHT0, ADC10CTL0);
 		break;
 	case 8:
 #ifdef ATOMIC
 		ADC10CTL0 = (ADC10CTL0 & ~ADC10SHT1) | ADC10SHT0;
 #else
-		ADC10CTL0 &= ~ADC10SHT1;
-		ADC10CTL0 |= ADC10SHT0;
+		__bic_w(ADC10SHT1, ADC10CTL0);
+		__bis_w(ADC10SHT0, ADC10CTL0);
 #endif
 		break;
 	case 16:
 #ifdef ATOMIC
 		ADC10CTL0 = (TACTL & ~ADC10SHT0) | ADC10SHT1;
 #else
-		ADC10CTL0 |= ADC10SHT1;
-		ADC10CTL0 &= ~ADC10SHT0;
+		__bis_w(ADC10SHT1, ADC10CTL0);
+		__bic_w(ADC10SHT0, ADC10CTL0);
 #endif
 		break;
 	case 64:
-		ADC10CTL0 |= ADC10SHT1 | ADC10SHT0;
+		__bis_w(ADC10SHT1 | ADC10SHT0, ADC10CTL0);
 		break;
 	}
 }
 
 static inline void
-adc10_sample_rate_50ksps(void)       { ADC10CTL0 |= ADC10SR; }
+adc10_sample_rate_50ksps(void)       { __bis_w(ADC10SR, ADC10CTL0); }
 static inline void
-adc10_sample_rate_200ksps(void)      { ADC10CTL0 &= ~ADC10SR; }
+adc10_sample_rate_200ksps(void)      { __bic_w(ADC10SR, ADC10CTL0); }
 static inline void
-adc10_reference_output_enable(void)  { ADC10CTL0 |= REFOUT; }
+adc10_reference_output_enable(void)  { __bis_w(REFOUT, ADC10CTL0); }
 static inline void
-adc10_reference_output_disable(void) { ADC10CTL0 &= ~REFOUT; }
+adc10_reference_output_disable(void) { __bic_w(REFOUT, ADC10CTL0); }
 static inline void
-adc10_reference_burst_enable(void)   { ADC10CTL0 |= REFBURST; }
+adc10_reference_burst_enable(void)   { __bis_w(REFBURST, ADC10CTL0); }
 static inline void
-adc10_reference_burst_disable(void)  { ADC10CTL0 &= ~REFBURST; }
+adc10_reference_burst_disable(void)  { __bic_w(REFBURST, ADC10CTL0); }
 static inline void
-adc10_sample_multiple(void)          { ADC10CTL0 |= MSC; }
+adc10_sample_multiple(void)          { __bis_w(MSC, ADC10CTL0); }
 static inline void
-adc10_sample_single(void)            { ADC10CTL0 &= ~MSC; }
+adc10_sample_single(void)            { __bic_w(MSC, ADC10CTL0); }
 static inline void
-adc10_reference_2_5V(void)           { ADC10CTL0 |= REF2_5V; }
+adc10_reference_2_5V(void)           { __bis_w(REF2_5V, ADC10CTL0); }
 static inline void
-adc10_reference_1_5V(void)           { ADC10CTL0 &= ~REF2_5V; }
+adc10_reference_1_5V(void)           { __bic_w(REF2_5V, ADC10CTL0); }
 static inline void
-adc10_reference_enable(void)         { ADC10CTL0 |= REFON; }
+adc10_reference_enable(void)         { __bis_w(REFON, ADC10CTL0); }
 static inline void
-adc10_reference_disable(void)        { ADC10CTL0 &= ~REFON; }
+adc10_reference_disable(void)        { __bic_w(REFON, ADC10CTL0); }
 static inline void
-adc10_interrupt_enable(void)         { ADC10CTL0 |= ADC10IE; }
+adc10_interrupt_enable(void)         { __bis_w(ADC10IE, ADC10CTL0); }
 static inline void
-adc10_interrupt_disable(void)        { ADC10CTL0 &= ~ADC10IE; }
+adc10_interrupt_disable(void)        { __bic_w(ADC10IE, ADC10CTL0); }
 static inline int
 adc10_interrupt_enabled(void)        { return ADC10CTL0 & ADC10IE; }
 static inline void
-adc10_interrupt_raise(void)          { ADC10CTL0 |= ADC10IFG; }
+adc10_interrupt_raise(void)          { __bis_w(ADC10IFG, ADC10CTL0); }
 static inline void
-adc10_interrupt_clear(void)          { ADC10CTL0 &= ~ADC10IFG; }
+adc10_interrupt_clear(void)          { __bic_w(ADC10IFG, ADC10CTL0); }
 static inline int
 adc10_interrupt_flag(void)           { return ADC10CTL0 & ADC10IFG; }
 static inline void
-adc10_conversion_enable(void)        { ADC10CTL0 |= ENC; }
+adc10_conversion_enable(void)        { __bis_w(ENC, ADC10CTL0); }
 static inline void
-adc10_conversion_disable(void)       { ADC10CTL0 &= ~ENC; }
+adc10_conversion_disable(void)       { __bic_w(ENC, ADC10CTL0); }
 static inline void
-adc10_conversion_start(void)         { ADC10CTL0 |= ADC10SC; }
+adc10_conversion_start(void)         { __bis_w(ADC10SC, ADC10CTL0); }
 static inline void
 adc10_conversion_run(void)           { ADC10CTL0 |= ENC | ADC10SC; }
 
 static inline void
 adc10_sample_and_hold_source_software(void)
 {
-	ADC10CTL1 &= ~(SHS1 | SHS0);
+	__bic_w(SHS1 | SHS0, ADC10CTL1);
 }
 
 static inline void
@@ -146,8 +147,8 @@ adc10_sample_and_hold_source_timera_out0(void)
 #ifdef ATOMIC
 	ADC10CTL1 = (ADC10CTL1 & ~SHS1) | SHS0;
 #else
-	ADC10CTL1 &= ~SHS1;
-	ADC10CTL1 |= SHS0;
+	__bic_w(SHS1, ADC10CTL1);
+	__bis_w(SHS0, ADC10CTL1);
 #endif
 }
 
@@ -157,30 +158,30 @@ adc10_sample_and_hold_source_timera_out1(void)
 #ifdef ATOMIC
 	ADC10CTL1 = (ADC10CTL1 & ~SHS0) | SHS1;
 #else
-	ADC10CTL1 |= SHS1;
-	ADC10CTL1 &= ~SHS0;
+	__bis_w(SHS1, ADC10CTL1);
+	__bic_w(SHS0, ADC10CTL1);
 #endif
 }
 
 static inline void
 adc10_sample_and_hold_source_timera_out2(void)
 {
-	ADC10CTL1 |= SHS1 | SHS0;
+	__bis_w(SHS1 | SHS0, ADC10CTL1);
 }
 
 static inline void
-adc10_data_format_2s_complement(void)     { ADC10CTL1 |= ADC10DF; }
+adc10_data_format_2s_complement(void)     { __bis_w(ADC10DF, ADC10CTL1); }
 static inline void
-adc10_data_format_binary(void)            { ADC10CTL1 &= ~(ADC10DF); }
+adc10_data_format_binary(void)            { __bic_w((ADC10DF), ADC10CTL1); }
 static inline void
-adc10_sample_and_hold_signal_invert(void) { ADC10CTL1 |= ISSH; }
+adc10_sample_and_hold_signal_invert(void) { __bis_w(ISSH, ADC10CTL1); }
 static inline void
-adc10_sample_and_hold_signal_normal(void) { ADC10CTL1 &= ~ISSH; }
+adc10_sample_and_hold_signal_normal(void) { __bic_w(ISSH, ADC10CTL1); }
 
 static inline void
 adc10_clock_source_osc(void)
 {
-	ADC10CTL1 &= ~(ADC10SSEL1 | ADC10SSEL0);
+	__bic_w(ADC10SSEL1 | ADC10SSEL0, ADC10CTL1);
 }
 
 static inline void
@@ -189,8 +190,8 @@ adc10_clock_source_aclk(void)
 #ifdef ATOMIC
 	ADC10CTL1 = (ADC10CTL1 & ~ADC10SSEL1) | ADC10SSEL0;
 #else
-	ADC10CTL1 &= ~ADC10SSEL1;
-	ADC10CTL1 |= ADC10SSEL0;
+	__bic_w(ADC10SSEL1, ADC10CTL1);
+	__bis_w(ADC10SSEL0, ADC10CTL1);
 #endif
 }
 
@@ -200,25 +201,25 @@ adc10_clock_source_mclk(void)
 #ifdef ATOMIC
 	ADC10CTL1 = (ADC10CTL1 & ~ADC10SSEL0) | ADC10SSEL1;
 #else
-	ADC10CTL1 |= ADC10SSEL1;
-	ADC10CTL1 &= ~ADC10SSEL0;
+	__bis_w(ADC10SSEL1, ADC10CTL1);
+	__bic_w(ADC10SSEL0, ADC10CTL1);
 #endif
 }
 
 static inline void
 adc10_clock_source_smclk(void)
 {
-	ADC10CTL1 |= ADC10SSEL1 | ADC10SSEL0;
+	__bis_w(ADC10SSEL1 | ADC10SSEL0, ADC10CTL1);
 }
 
 static inline void
-adc10_channel_multiple(void) { ADC10CTL1 |= CONSEQ0; }
+adc10_channel_multiple(void) { __bis_w(CONSEQ0, ADC10CTL1); }
 static inline void
-adc10_channel_single(void)   { ADC10CTL1 &= ~CONSEQ0; }
+adc10_channel_single(void)   { __bic_w(CONSEQ0, ADC10CTL1); }
 static inline void
-adc10_sequence_repeat(void)  { ADC10CTL1 |= CONSEQ1; }
+adc10_sequence_repeat(void)  { __bis_w(CONSEQ1, ADC10CTL1); }
 static inline void
-adc10_sequence_single(void)  { ADC10CTL1 &= ~CONSEQ1; }
+adc10_sequence_single(void)  { __bic_w(CONSEQ1, ADC10CTL1); }
 
 static inline int
 adc10_busy(void)             { return ADC10CTL1 & ADC10BUSY; }
@@ -227,12 +228,12 @@ static inline void
 adc10_input_enable(unsigned int n)
 {
 	if (n < 8) {
-		ADC10AE0 |= 1 << n;
+		__bis_b(1 << n, ADC10AE0);
 		return;
 	}
 
 #ifdef ADC10AE1
-	ADC10AE1 |= 1 << (n-8);
+	__bis_b(1 << (n-8), ADC10AE1);
 #endif
 }
 
@@ -240,12 +241,12 @@ static inline void
 adc10_input_disable(unsigned int n)
 {
 	if (n < 8) {
-		ADC10AE0 &= ~(1 << n);
+		__bic_b(1 << n, ADC10AE0);
 		return;
 	}
 
 #ifdef ADC10AE1
-	ADC10AE1 &= ~(1 << (n-8));
+	__bic_b(1 << (n-8), ADC10AE1);
 #endif
 }
 
@@ -253,13 +254,13 @@ static inline int
 adc10_result(void)                   { return ADC10MEM; }
 
 static inline void
-adc10_transfer_two_block(void)       { ADC10DTC0 |= ADC10TB; }
+adc10_transfer_two_block(void)       { __bis_b(ADC10TB, ADC10DTC0); }
 static inline void
-adc10_transfer_one_block(void)       { ADC10DTC0 &= ~ADC10TB; }
+adc10_transfer_one_block(void)       { __bic_b(ADC10TB, ADC10DTC0); }
 static inline void
-adc10_transfer_continuous(void)      { ADC10DTC0 |= ADC10CT; }
+adc10_transfer_continuous(void)      { __bis_b(ADC10CT, ADC10DTC0); }
 static inline void
-adc10_transfer_intermittent(void)    { ADC10DTC0 &= ~ADC10CT; }
+adc10_transfer_intermittent(void)    { __bic_b(ADC10CT, ADC10DTC0); }
 static inline int
 adc10_transfer_block1(void)          { return ADC10DTC0 & ADC10B1; }
 static inline int

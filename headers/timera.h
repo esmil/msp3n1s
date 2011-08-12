@@ -125,13 +125,13 @@ static inline void
 timera_interrupt_enable(void)  { __bis_w(TAIE, TACTL); }
 static inline void
 timera_interrupt_disable(void) { __bic_w(TAIE, TACTL); }
-static inline int
+static inline unsigned int
 timera_interrupt_enabled(void) { return TACTL & TAIE; }
 static inline void
 timera_interrupt_raise(void)   { __bis_w(TAIFG, TACTL); }
 static inline void
 timera_interrupt_clear(void)   { __bic_w(TAIFG, TACTL); }
-static inline int
+static inline unsigned int
 timera_interrupt_flag(void)    { return TACTL & TAIFG; }
 static inline unsigned int
 timera_count(void)             { return TAR; }
@@ -169,13 +169,13 @@ timera_count(void)             { return TAR; }
 	timera_cc##n##_interrupt_enable(void)  { __bis_w(CCIE, TACCTL##n); }\
 	static inline void\
 	timera_cc##n##_interrupt_disable(void) { __bic_w(CCIE, TACCTL##n); }\
-	static inline int\
+	static inline unsigned int\
 	timera_cc##n##_interrupt_enabled(void) { return TACCTL##n & CCIE; }\
 	static inline void\
 	timera_cc##n##_output_high(void)       { __bis_w(OUT, TACCTL##n); }\
 	static inline void\
 	timera_cc##n##_output_low(void)        { __bic_w(OUT, TACCTL##n); }\
-	static inline int\
+	static inline unsigned int\
 	timera_cc##n##_capture_overflow(void)  { return TACCTL##n & COV; }\
 	static inline void\
 	timera_cc##n##_interrupt_raise(void)   { __bis_w(CCIFG, TACCTL##n); }\

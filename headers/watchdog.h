@@ -81,26 +81,26 @@ static inline void
 watchdog_timer_interrupt_enable(void)  { __bis_b(WDTIE, IE1); }
 static inline void
 watchdog_timer_interrupt_disable(void) { __bic_b(WDTIE, IE1); }
-static inline int
+static inline unsigned char
 watchdog_timer_interrupt_enabled(void) { return IE1 & WDTIE; }
 static inline void
 watchdog_nmi_interrupt_enable(void)    { __bis_b(NMIIE, IE1); }
 static inline void
 watchdog_nmi_interrupt_disable(void)   { __bic_b(NMIIE, IE1); }
-static inline int
+static inline unsigned char
 watchdog_nmi_interrupt_enabled(void)   { return IE1 & NMIIE; }
 
 static inline void
 watchdog_timer_interrupt_raise(void)   { __bis_b(WDTIFG, IFG1); }
 static inline void
 watchdog_timer_interrupt_clear(void)   { __bic_b(WDTIFG, IFG1); }
-static inline int
+static inline unsigned char
 watchdog_timer_interrupt_flag(void)    { return IFG1 & WDTIFG; }
 static inline void
 watchdog_nmi_interrupt_raise(void)     { __bis_b(NMIIFG, IFG1); }
 static inline void
 watchdog_nmi_interrupt_clear(void)     { __bic_b(NMIIFG, IFG1); }
-static inline int
+static inline unsigned char
 watchdog_nmi_interrupt_flag(void)      { return IFG1 & NMIIFG; }
 
 static inline void

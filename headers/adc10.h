@@ -118,13 +118,13 @@ static inline void
 adc10_interrupt_enable(void)         { __bis_w(ADC10IE, ADC10CTL0); }
 static inline void
 adc10_interrupt_disable(void)        { __bic_w(ADC10IE, ADC10CTL0); }
-static inline int
+static inline unsigned int
 adc10_interrupt_enabled(void)        { return ADC10CTL0 & ADC10IE; }
 static inline void
 adc10_interrupt_raise(void)          { __bis_w(ADC10IFG, ADC10CTL0); }
 static inline void
 adc10_interrupt_clear(void)          { __bic_w(ADC10IFG, ADC10CTL0); }
-static inline int
+static inline unsigned int
 adc10_interrupt_flag(void)           { return ADC10CTL0 & ADC10IFG; }
 static inline void
 adc10_conversion_enable(void)        { __bis_w(ENC, ADC10CTL0); }
@@ -221,7 +221,7 @@ adc10_sequence_repeat(void)  { __bis_w(CONSEQ1, ADC10CTL1); }
 static inline void
 adc10_sequence_single(void)  { __bic_w(CONSEQ1, ADC10CTL1); }
 
-static inline int
+static inline unsigned int
 adc10_busy(void)             { return ADC10CTL1 & ADC10BUSY; }
 
 static inline void
@@ -261,9 +261,9 @@ static inline void
 adc10_transfer_continuous(void)      { __bis_b(ADC10CT, ADC10DTC0); }
 static inline void
 adc10_transfer_intermittent(void)    { __bic_b(ADC10CT, ADC10DTC0); }
-static inline int
+static inline unsigned char
 adc10_transfer_block1(void)          { return ADC10DTC0 & ADC10B1; }
-static inline int
+static inline unsigned char
 adc10_transfer_block2(void)          { return !(ADC10DTC0 & ADC10B1); }
 
 #define adc10_interrupt(x...) __attribute__((interrupt(ADC10_VECTOR)))\

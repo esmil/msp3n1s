@@ -187,6 +187,11 @@ serial_printf(const char *fmt, ...)
 			serial__int_b10(va_arg(ap, int));
 			break;
 #endif
+#ifdef SERIAL_PRINTF_C
+		case 'c':
+			serial__char(va_arg(ap, unsigned int));
+			break;
+#endif
 #ifdef SERIAL_PRINTF_S
 		case 's':
 			serial__string(va_arg(ap, const char *));

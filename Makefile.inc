@@ -40,7 +40,7 @@ MODE_1 = -cstopb
 MODE_2 = cstopb
 MODE = $(MODE_RAW) $(MODE_8) $(MODE_N) $(MODE_1)# 8N1
 
-.PHONY: all modules clean
+.PHONY: all debug modules clean
 .PRECIOUS: %.elf
 
 all: $(NAME).elf
@@ -59,6 +59,9 @@ all: $(NAME).elf
 	@$(OBJDUMP) -ld $< | $(SED) -e '/\/.*/d' > $@
 
 list: $(NAME).lst $(NAME).lss
+
+debug:
+	$(MSPDEBUG) $(DRIVER)
 
 upload: $(NAME).elf
 	@$(MSPDEBUG) $(DRIVER) erase 'load $<'

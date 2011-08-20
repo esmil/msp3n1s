@@ -221,6 +221,12 @@ adc10_sequence_repeat(void)  { __bis_w(ADC10CTL1, CONSEQ1); }
 static inline void
 adc10_sequence_single(void)  { __bic_w(ADC10CTL1, CONSEQ1); }
 
+static inline void
+adc10_input_channel(unsigned int n)
+{
+	ADC10CTL1 |= n << 12;
+}
+
 static inline unsigned int
 adc10_busy(void)             { return ADC10CTL1 & ADC10BUSY; }
 
@@ -228,12 +234,12 @@ static inline void
 adc10_input_enable(unsigned int n)
 {
 	if (n < 8) {
-		__bis_b(ADC10AE0, 1 << n);
+		ADC10AE0 |= 1 << n;
 		return;
 	}
 
 #ifdef ADC10AE1
-	__bis_b(ADC10AE1, 1 << (n-8));
+	ADC10AE1 |= 1 << (n-8);
 #endif
 }
 
@@ -241,12 +247,12 @@ static inline void
 adc10_input_disable(unsigned int n)
 {
 	if (n < 8) {
-		__bic_b(ADC10AE0, 1 << n);
+		ADC10AE0 &= ~(1 << n);
 		return;
 	}
 
 #ifdef ADC10AE1
-	__bic_b(ADC10AE1, 1 << (n-8));
+	ADC10AE1 &= ~(1 << (n-8));
 #endif
 }
 

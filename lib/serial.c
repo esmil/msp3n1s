@@ -44,14 +44,14 @@ timera_cc0_interrupt(void)
 	serial_txbyte >>= 1;
 }
 
-static __attribute__((unused)) void
+static void __attribute__((unused))
 serial__char(unsigned char c)
 {
 	serial_txbyte = (c | 0x100) << 1;
 	LPM0;
 }
 
-static __attribute__((unused)) void
+static void __attribute__((unused))
 serial_putchar(unsigned char c)
 {
 	timera_cc0_set(timera_count() + 16);
@@ -62,7 +62,7 @@ serial_putchar(unsigned char c)
 	timera_cc0_interrupt_disable();
 }
 
-static __attribute__((unused)) void
+static void __attribute__((unused))
 serial__string(const char *p)
 {
 	unsigned char c;
@@ -71,7 +71,7 @@ serial__string(const char *p)
 		serial__char(c);
 }
 
-static __attribute__((unused)) void
+static void __attribute__((unused))
 serial_puts(const char *p)
 {
 	timera_cc0_set(timera_count() + 16);
@@ -82,7 +82,7 @@ serial_puts(const char *p)
 	timera_cc0_interrupt_disable();
 }
 
-static __attribute__((unused)) void
+static void __attribute__((unused))
 serial__uint_b10(unsigned int n)
 {
 	if (n >= 10000)
@@ -105,7 +105,7 @@ static const unsigned char serial_hexdigits[] = {
 	'8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
 };
 
-static __attribute__((unused)) void
+static void __attribute__((unused))
 serial__uint_b16(unsigned int n)
 {
 	if (n > 0xFFF)
@@ -120,7 +120,7 @@ serial__uint_b16(unsigned int n)
 	serial__char(serial_hexdigits[n & 0xF]);
 }
 
-static __attribute__((unused)) void
+static void __attribute__((unused))
 serial_dump(const void *buf, unsigned int len)
 {
 	const unsigned char *p = buf;
@@ -140,7 +140,7 @@ serial_dump(const void *buf, unsigned int len)
 	timera_cc0_interrupt_disable();
 }
 
-static __attribute__((unused)) void
+static void __attribute__((unused))
 serial__int_b10(int n)
 {
 	if (n < 0) {
@@ -151,7 +151,7 @@ serial__int_b10(int n)
 	serial__uint_b10(n);
 }
 
-static __attribute__((unused)) void
+static void __attribute__((unused))
 serial_printf(const char *fmt, ...)
 {
 	unsigned char c;

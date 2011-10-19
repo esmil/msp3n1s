@@ -71,8 +71,9 @@ main(void)
 	watchdog_off();
 	clock_init_1MHz();
 
-	/* set all pins in output mode */
-	port1_direction_set(0xFF);
+	/* set all pins to output high */
+	port1_direction = 0xFF;
+	port1_output = 0xFF;
 
 	/* configure push button */
 	pin_mode_input(S2);

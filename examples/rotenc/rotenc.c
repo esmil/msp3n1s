@@ -50,7 +50,7 @@ blink(void)
 static void
 port1_interrupt(void)
 {
-	port1_interrupts_clear();
+	port1_interrupt_flags = 0x00;
 	LPM0_EXIT;
 }
 
@@ -60,9 +60,11 @@ main(void)
 	watchdog_off();
 	clock_init_1MHz();
 
+	/* set all pins to output high */
+	port1_direction = 0xFF;
+	port1_output = 0xFF;
+
 	/* set up LED pins */
-	pin_mode_output(LED1);
-	pin_mode_output(LED2);
 	pin_low(LED1);
 	pin_low(LED2);
 

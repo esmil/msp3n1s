@@ -22,6 +22,12 @@
 #include <msp430.h>
 #include <macros.h>
 
+static inline __attribute__((always_inline)) unsigned char
+pin_mask(double pin)
+{
+	return 1 << ((unsigned int)(10*pin) % 10);
+}
+
 #define define_pin_set(name, on, off) \
 	static inline __attribute__((always_inline)) void\
 	pin_##on(double pin)\
@@ -65,22 +71,6 @@
 		}\
 		return 0;\
 	}
-
-#define define_port(n)\
-	static inline __attribute__((always_inline)) void\
-	port##n##_direction_set(unsigned char v) { P##n##DIR = v; }\
-	static inline __attribute__((always_inline)) void\
-	port##n##_set(unsigned char v)           { P##n##OUT = v; }\
-	static inline __attribute__((always_inline)) void\
-	port##n##_setbits(unsigned char v)       { P##n##OUT &= v; }\
-	static inline __attribute__((always_inline)) void\
-	port##n##_clearbits(unsigned char v)     { P##n##OUT &= ~v; }\
-	static inline __attribute__((always_inline)) unsigned char\
-	port##n##_get(void)                      { return P##n##IN; }\
-	static inline __attribute__((always_inline)) void\
-	port##n##_interrupts_raise(void)         { P##n##IFG = 0xFF; }\
-	static inline __attribute__((always_inline)) void\
-	port##n##_interrupts_clear(void)         { P##n##IFG = 0x00; }
 
 define_pin_set(DIR, mode_output, mode_input)
 define_pin_set(REN, resistor_enable, resistor_disable)
@@ -203,8 +193,21 @@ pin_function_oscillator(double pin)
 }
 #endif
 
-define_port(1)
-define_port(2)
+#define port1_direction P1DIR
+#define port1_resistors P1REN
+#define port1_input P1IN
+#define port1_output P1OUT
+#define port1_interrupt_enable P1IE
+#define port1_interrupt_edges P1IES
+#define port1_interrupt_flags P1IFG
+
+#define port2_direction P2DIR
+#define port2_resistors P2REN
+#define port2_input P2IN
+#define port2_output P2OUT
+#define port2_interrupt_enable P2IE
+#define port2_interrupt_edges P2IES
+#define port2_interrupt_flags P2IFG
 
 #define port1_interrupt(x...) __attribute__((interrupt(PORT1_VECTOR)))\
 	port1_interrupt(x)

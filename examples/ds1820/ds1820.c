@@ -97,9 +97,11 @@ main(void)
 	watchdog_off();
 	clock_init_1MHz();
 
-	pin_mode_output(LED1);
+	/* set all pins to output high */
+	port1_direction = 0xFF;
+	port1_output = 0xFF;
+
 	pin_low(LED1);
-	pin_mode_output(LED2);
 	pin_low(LED2);
 
 	pin_mode_input(S2);

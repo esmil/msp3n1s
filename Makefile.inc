@@ -5,6 +5,16 @@
 #NAME =
 #BASE =
 
+## Set the chip type here
+MCU = msp430g2231
+#MCU = msp430g2211
+
+## Change this according to your code to make the tty and cat targets work
+BAUD = 9600
+MODE = $(MODE_RAW) $(MODE_8) $(MODE_N) $(MODE_1)# 8N1
+
+DRIVER = rf2500
+
 CC = msp430-gcc
 OBJDUMP = msp430-objdump
 SIZE = msp430-size
@@ -14,11 +24,11 @@ CAT = cat
 MODPROBE = modprobe
 STTY = stty
 
-MCU = msp430g2231
-#MCU = msp430g2211
-DRIVER = rf2500
-CFLAGS = -std=gnu99 -mmcu=$(MCU) -O2 -pipe -g -Wall -Wextra -Wno-variadic-macros -pedantic
-# -ffunction-sections -fdata-sections
+OPT     = 2
+CFLAGS  = -mmcu=$(MCU) -O$(OPT) -pipe -g
+CFLAGS += -std=gnu99 -Wall -Wextra -Wno-variadic-macros -pedantic
+CFLAGS += -fstrict-aliasing -fstrict-overflow
+#CFLAGS += -ffunction-sections -fdata-sections
 
 ifdef BASE
 CFLAGS += -iquote$(BASE) -I$(BASE)/headers
@@ -28,9 +38,7 @@ endif
 MODULES = uhci-hcd cdc-acm ti_usb_3410_5052
 
 PORT = /dev/ttyACM0
-BAUD = 9600
-#BAUD = 2400
-MODE_RAW = raw -echo
+MODE_RAW = raw -echo -hup
 MODE_7 = cs7
 MODE_8 = cs8
 MODE_N = -parenb
@@ -38,7 +46,6 @@ MODE_E = parenb -parodd
 MODE_O = parenb parodd
 MODE_1 = -cstopb
 MODE_2 = cstopb
-MODE = $(MODE_RAW) $(MODE_8) $(MODE_N) $(MODE_1)# 8N1
 
 .PHONY: all debug modules clean
 .PRECIOUS: %.elf
@@ -47,7 +54,7 @@ all: $(NAME).elf
 
 %.elf: %.c
 	@echo '  CC/LD $@'
-	@$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
+	@$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 	@$(SIZE) $@ | $(SED) -ne '2s/[\t ]*[0-9]*[\t ]*[0-9]*[\t ]*[0-9]*[\t ]*\([0-9]*\).*/  \1 bytes/p'
 
 %.lst: %.elf

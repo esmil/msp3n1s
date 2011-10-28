@@ -1,4 +1,4 @@
 NAME = rotenc
 BASE = ../..
 
-include $(BASE)/Makefile.inc
+include $(BASE)/Makefile

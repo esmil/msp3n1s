@@ -1,4 +1,4 @@
 NAME = serial
 BASE = ../..
 
-include $(BASE)/Makefile.inc
+include $(BASE)/Makefile

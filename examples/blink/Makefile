@@ -1,4 +1,4 @@
 NAME = blink
 BASE = ../..
 
-include $(BASE)/Makefile.inc
+include $(BASE)/Makefile

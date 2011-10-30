@@ -30,14 +30,14 @@ static volatile unsigned int serial_txbyte;
 static void
 timera_cc0_interrupt(void)
 {
-	timera_cc0_add(BITTIME);     /* add offset */
+	timera_cc0 += BITTIME;       /* add offset */
 
-	if (serial_txbyte == 0) { /* all bits sent, wake up */
+	if (serial_txbyte == 0) {    /* all bits sent, wake up */
 		LPM0_EXIT;
 		return;
 	}
 
-	TACCTL0 |= OUTMOD2;  /* clear TX on next interrupt */
+	TACCTL0 |= OUTMOD2;          /* clear TX on next interrupt */
 	if (serial_txbyte & 0x01)
 		TACCTL0 &= ~OUTMOD2; /* set TX on next interrupt */
 
@@ -54,7 +54,7 @@ serial__char(unsigned char c)
 static void __attribute__((unused))
 serial_putchar(unsigned char c)
 {
-	timera_cc0_set(timera_count() + 16);
+	timera_cc0 = timera_count + 16;
 	timera_cc0_interrupt_enable();
 
 	serial__char(c);
@@ -74,7 +74,7 @@ serial__string(const char *p)
 static void __attribute__((unused))
 serial_puts(const char *p)
 {
-	timera_cc0_set(timera_count() + 16);
+	timera_cc0 = timera_count + 16;
 	timera_cc0_interrupt_enable();
 
 	serial__string(p);
@@ -125,7 +125,7 @@ serial_dump(const void *buf, unsigned int len)
 {
 	const unsigned char *p = buf;
 
-	timera_cc0_set(timera_count() + 16);
+	timera_cc0 = timera_count + 16;
 	timera_cc0_interrupt_enable();
 
 	for (; len > 0; len--) {
@@ -159,7 +159,7 @@ serial_printf(const char *fmt, ...)
 
 	va_start(ap, fmt);
 
-	timera_cc0_set(timera_count() + 16);
+	timera_cc0 = timera_count + 16;
 	timera_cc0_interrupt_enable();
 
 	for (c = *fmt++; c != '\0'; c = *fmt++) {

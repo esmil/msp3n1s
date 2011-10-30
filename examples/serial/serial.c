@@ -57,7 +57,7 @@ watchdog_interrupt(void)
 static void
 timera_cc1_interrupt(void)
 {
-	timera_cc1_add(BLINKTIME);
+	timera_cc1 += BLINKTIME;
 
 	pin_toggle(LED1);
 	pin_toggle(LED2);
@@ -91,7 +91,7 @@ main(void)
 	/* start blinking */
 	pin_high(LED1);
 	pin_low(LED2);
-	timera_cc1_set(timera_count() + BLINKTIME);
+	timera_cc1 = timera_count + BLINKTIME;
 	timera_cc1_interrupt_enable();
 
 	while (1) {

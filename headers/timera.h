@@ -133,16 +133,12 @@ static inline void
 timera_interrupt_clear(void)   { __bic_w(TACTL, TAIFG); }
 static inline unsigned int
 timera_interrupt_flag(void)    { return TACTL & TAIFG; }
-static inline unsigned int
-timera_count(void)             { return TAR; }
+
+#define timera_count TAR
+#define timera_cc0 TACCR0
+#define timera_cc1 TACCR1
 
 #define define_capture_compare(n)\
-	static inline void\
-	timera_cc##n##_set(unsigned int v)     { TACCR##n = v; }\
-	static inline void\
-	timera_cc##n##_add(unsigned int v)     { TACCR##n += v; }\
-	static inline unsigned int\
-	timera_cc##n(void)                     { return TACCR##n; }\
 	static inline void\
 	timera_cc##n##_capture_none(void)      { __bic_w(TACCTL##n, CM1 | CM0); }\
 	static inline void\
@@ -188,6 +184,8 @@ timera_count(void)             { return TAR; }
 define_capture_compare(0)
 define_capture_compare(1)
 
+#undef define_capture_compare
+
 #define timera_interrupt(x...) __attribute__((interrupt(TIMERA1_VECTOR)))\
 	timera_interrupt(x)
 #define timera_cc0_interrupt(x...) __attribute__((interrupt(TIMERA0_VECTOR)))\
@@ -195,5 +193,4 @@ define_capture_compare(1)
 #define timera_cc1_interrupt(x...) __attribute__((interrupt(TIMERA1_VECTOR)))\
 	timera_cc1_interrupt(x)
 
-#undef define_capture_compare
 #endif

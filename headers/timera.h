@@ -158,25 +158,39 @@ timera_interrupt_flag(void)    { return TACTL & TAIFG; }
 	static inline void\
 	timera_cc##n##_capture(void)           { TACCTL##n ^= CCIS0; }\
 	static inline void\
+	timera_cc##n##_capture_sync(void)      { __bis_w(TACCTL##n, SCS); }\
+	static inline void\
+	timera_cc##n##_capture_async(void)     { __bic_w(TACCTL##n, SCS); }\
+	static inline unsigned int\
+	timera_cc##n##_input_sync(void)        { return TACCTL##n & SCCI; }\
+	static inline void\
 	timera_cc##n##_mode_capture(void)      { __bis_w(TACCTL##n, CAP); }\
 	static inline void\
 	timera_cc##n##_mode_compare(void)      { __bic_w(TACCTL##n, CAP); }\
+	static inline unsigned int\
+	timera_cc##n##_mode_is_capture(void)   { return TACCTL##n & CAP; }\
 	static inline void\
 	timera_cc##n##_interrupt_enable(void)  { __bis_w(TACCTL##n, CCIE); }\
 	static inline void\
 	timera_cc##n##_interrupt_disable(void) { __bic_w(TACCTL##n, CCIE); }\
 	static inline unsigned int\
 	timera_cc##n##_interrupt_enabled(void) { return TACCTL##n & CCIE; }\
+	static inline unsigned int\
+	timera_cc##n##_input_async(void)       { return TACCTL##n & CCI; }\
 	static inline void\
 	timera_cc##n##_output_high(void)       { __bis_w(TACCTL##n, OUT); }\
 	static inline void\
 	timera_cc##n##_output_low(void)        { __bic_w(TACCTL##n, OUT); }\
+	static inline void\
+	timera_cc##n##_overflow_clear(void)    { __bic_w(TACCTL##n, COV); }\
 	static inline unsigned int\
-	timera_cc##n##_capture_overflow(void)  { return TACCTL##n & COV; }\
+	timera_cc##n##_overflow(void)          { return TACCTL##n & COV; }\
 	static inline void\
 	timera_cc##n##_interrupt_raise(void)   { __bis_w(TACCTL##n, CCIFG); }\
 	static inline void\
 	timera_cc##n##_interrupt_clear(void)   { __bic_w(TACCTL##n, CCIFG); }\
+	static inline unsigned int\
+	timera_cc##n##_interrupt_flag(void)    { return TACCTL##n & CCIFG; }\
 	static inline void\
 	timera_cc##n##_output_mode(unsigned int mode)\
 	{ __bis_w(TACCTL##n, mode << 5); }

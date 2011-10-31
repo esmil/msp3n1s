@@ -27,7 +27,7 @@
 #define SERIAL_PRINTF_X
 #define SERIAL_PRINTF_D
 #define SERIAL_PRINTF_S
-#include "lib/serial.c"
+#include "lib/serial_tx.c"
 
 #define BLINKTIME 0xFFFF
 
@@ -83,7 +83,8 @@ main(void)
 	pin_interrupt_clear(S2);
 	pin_interrupt_enable(S2);
 
-	serial_init();
+	serial_init_clock();
+	serial_init_tx();
 
 	/* enable interrupts */
 	__eint();

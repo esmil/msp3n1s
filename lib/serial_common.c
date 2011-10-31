@@ -16,13 +16,26 @@
  * along with msp3n1s.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "lib/serial_tx.c"
-#include "lib/serial_rx.c"
+#ifndef _SERIAL_COMMON_C
+#define _SERIAL_COMMON_C
 
-static void __attribute__((unused))
-serial_init(void)
+#include <timera.h>
+#include <stdarg.h>
+
+#define SERIAL_TX 1.1
+#define SERIAL_RX 1.2
+
+#ifndef BITTIME
+/* conditions for 1Mhz / (13*8) ~= 9600 bps software UART */
+#define BITTIME   (13*8)
+#endif
+
+static void
+serial_init_clock(void)
 {
-	serial_init_clock();
-	serial_init_tx();
-	serial_init_rx();
+	timera_clock_source_smclk();
+	timera_clock_divide(1);
+	timera_mode_continuous();
 }
+
+#endif

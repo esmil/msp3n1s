@@ -15,14 +15,15 @@ MODE = $(MODE_RAW) $(MODE_8) $(MODE_N) $(MODE_1)# 8N1
 
 DRIVER = rf2500
 
-CC = msp430-gcc
-OBJDUMP = msp430-objdump
-SIZE = msp430-size
+CC       = msp430-gcc
+OBJDUMP  = msp430-objdump
+SIZE     = msp430-size
 MSPDEBUG = mspdebug
-SED = sed
-CAT = cat
 MODPROBE = modprobe
-STTY = stty
+SED      = sed
+STTY     = stty
+CAT      = cat
+SCREEN   = screen
 
 OPT     = 2
 CFLAGS  = -mmcu=$(MCU) -O$(OPT) -pipe -g
@@ -85,6 +86,9 @@ tty: $(PORT)
 
 cat: $(PORT)
 	@$(CAT) $(PORT)
+
+screen:
+	$(SCREEN) $(PORT) $(BAUD)
 
 clean:
 	rm -f *.elf *.lss *.lst

@@ -26,8 +26,8 @@
 #define SERIAL_RX 1.2
 
 #ifndef BITTIME
-/* conditions for 1Mhz / (13*8) ~= 9600 bps software UART */
-#define BITTIME   (13*8)
+/* conditions for 1MHz / 417 ~= 2400 bps software UART */
+#define BITTIME 417
 #endif
 
 static void

@@ -10,7 +10,7 @@ MCU = msp430g2231
 #MCU = msp430g2211
 
 ## Change this according to your code to make the tty and cat targets work
-BAUD = 9600
+BAUD = 2400
 MODE = $(MODE_RAW) $(MODE_8) $(MODE_N) $(MODE_1)# 8N1
 
 DRIVER = rf2500

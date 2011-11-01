@@ -25,7 +25,7 @@
 #define S2   1.3
 
 #define SERIAL_PRINTF_D
-#include "lib/serial.c"
+#include "lib/serial_tx.c"
 
 #define ONEWIRE_PIN 1.5
 #define ONEWIRE_INTERNAL_PULLUP
@@ -84,10 +84,10 @@ dtemp_convert_single(unsigned char scratchpad[9])
 	return dtemp__scratchpad_read(scratchpad);
 }
 
-static void
+void
 port1_interrupt(void)
 {
-	pin_interrupt_clear(S2);
+	pin_interrupt_disable(S2);
 	LPM0_EXIT;
 }
 
@@ -102,29 +102,42 @@ main(void)
 	port1_output = 0xFF;
 
 	pin_low(LED1);
-	pin_low(LED2);
 
+	/* initialize S2 to receive button press interrupt */
 	pin_mode_input(S2);
 	pin_resistor_enable(S2);
 	pin_high(S2);
 	pin_interrupt_falling(S2);
-	pin_interrupt_enable(S2);
 
+	/* initialize onewire */
 	onewire_init();
-	serial_init();
 
+	/* initialize serial output */
+	serial_init_clock();
+	serial_init_tx();
+
+	/* enable interrupts */
 	__eint();
 
 	while (1) {
 		unsigned char scratchpad[9];
 		int val;
 
-		LPM0;
-
-		pin_high(LED2);
-		if (dtemp_convert_single(scratchpad))
-			goto error;
+		/* wait for button press */
 		pin_low(LED2);
+		pin_interrupt_clear(S2);
+		pin_interrupt_enable(S2);
+		LPM0;
+		pin_high(LED2);
+
+		pin_high(LED1);
+		val = dtemp_convert_single(scratchpad);
+		pin_low(LED1);
+
+		if (val) {
+			serial_printf("No slave found.\n");
+			continue;
+		}
 
 		val = (scratchpad[1] << 8) | scratchpad[0];
 
@@ -137,11 +150,5 @@ main(void)
 		serial_printf("..or %d - 0.25 + %d/%d C\n", val / 2,
 		              (int)(scratchpad[7] - scratchpad[6]),
 			      (int)scratchpad[7]);
-		continue;
-
-error:
-		pin_low(LED1);
-		pin_low(LED2);
-		serial_puts("No slave found.\n");
 	}
 }

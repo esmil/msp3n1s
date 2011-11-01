@@ -32,7 +32,7 @@
 #define LED1 1.0
 #define LED2 1.6
 
-#include "lib/serial_tx.c"
+#include "lib/serial_tx_buffered.c"
 
 #define SERIAL_RX_BUFSIZE 32
 #include "lib/serial_rx_buffered.c"

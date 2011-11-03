@@ -28,7 +28,7 @@
 #include "lib/serial_tx.c"
 
 #define ONEWIRE_PIN 1.5
-#define ONEWIRE_INTERNAL_PULLUP
+/* #define ONEWIRE_INTERNAL_PULLUP */
 #include "lib/onewire.c"
 
 static void
@@ -91,6 +91,34 @@ port1_interrupt(void)
 	LPM0_EXIT;
 }
 
+static void
+read_temperature(unsigned char rom[8])
+{
+	unsigned char scratchpad[9];
+	int val;
+
+	pin_high(LED1);
+	val = dtemp_convert(rom, scratchpad);
+	pin_low(LED1);
+
+	if (val) {
+		serial_printf("Error reading temperature\n");
+		return;
+	}
+
+	val = (scratchpad[1] << 8) | scratchpad[0];
+
+	serial_printf("Read %d.%d C\n", val / 2, (val & 1) ? 5 : 0);
+	serial_printf("..or %d - 0.25 + %d/%d C\n", val / 2,
+			(int)(scratchpad[7] - scratchpad[6]),
+			(int)scratchpad[7]);
+
+	/*
+	serial_printf("Scratchpad: ");
+	serial_dump(scratchpad, 9);
+	*/
+}
+
 int
 main(void)
 {
@@ -120,8 +148,8 @@ main(void)
 	__eint();
 
 	while (1) {
-		unsigned char scratchpad[9];
-		int val;
+		unsigned char search_state = 0;
+		unsigned char rom[8];
 
 		/* wait for button press */
 		pin_low(LED2);
@@ -130,25 +158,27 @@ main(void)
 		LPM0;
 		pin_high(LED2);
 
-		pin_high(LED1);
-		val = dtemp_convert_single(scratchpad);
-		pin_low(LED1);
+		do {
+			if (onewire_search(&search_state, rom)) {
+				serial_printf("Error during search\n");
+				break;
+			}
 
-		if (val) {
-			serial_printf("No slave found.\n");
-			continue;
-		}
+			if (onewire_crc_8bit(rom, 8)) {
+				serial_printf("Error validating ROM\n");
+				break;
+			}
 
-		val = (scratchpad[1] << 8) | scratchpad[0];
+			serial_printf("\nFound slave: ");
+			serial_dump(rom, 8);
 
-		/*
-		serial_dump(rom, 8);
-		serial_dump(scratchpad, 9);
-		*/
+			/* if this slave is in the DS1820 family
+			 * read the temperature */
+			if (rom[0] == 0x10)
+				read_temperature(rom);
 
-		serial_printf("Read %d.%d C\n", val / 2, (val & 1) ? 5 : 0);
-		serial_printf("..or %d - 0.25 + %d/%d C\n", val / 2,
-		              (int)(scratchpad[7] - scratchpad[6]),
-			      (int)scratchpad[7]);
+		} while (search_state);
+
+		serial_printf("Done.\n");
 	}
 }

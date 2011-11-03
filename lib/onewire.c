@@ -94,6 +94,31 @@ onewire_reset(void)
 }
 
 static void
+onewire_transmit_1bit(unsigned char bit)
+{
+#ifndef ONEWIRE_INTERNAL_PULLUP
+	pin_high(ONEWIRE_PIN);
+#endif
+	pin_mode_output(ONEWIRE_PIN);
+
+	if (bit) {
+		pin_low(ONEWIRE_PIN);
+		pin_high(ONEWIRE_PIN);
+		delay_cycles(55);
+	} else {
+		pin_low(ONEWIRE_PIN);
+		delay_cycles(65);
+		pin_high(ONEWIRE_PIN);
+		delay_cycles(5);
+	}
+
+	pin_mode_input(ONEWIRE_PIN);
+#ifndef ONEWIRE_INTERNAL_PULLUP
+	pin_low(ONEWIRE_PIN);
+#endif
+}
+
+static void
 onewire_transmit_8bit(unsigned char byte)
 {
 	unsigned char mask;
@@ -204,4 +229,81 @@ onewire_rom_skip(void)
 	onewire_transmit_8bit(0xCC);
 
 	return 0;
+}
+
+static int __attribute__((unused))
+onewire__search(unsigned char *state, unsigned char rom[8])
+{
+	unsigned char lastzb;
+	unsigned char bit;
+	unsigned int i;
+
+	lastzb = 0;
+	bit = 1;
+	for (i = 0; i < 8; i++) {
+		unsigned char mask;
+
+		for (mask = 1; mask; mask <<= 1) {
+			unsigned char tx;
+
+			if (bit > *state)
+				rom[i] &= ~mask;
+
+			if (onewire_receive_1bit()) {
+				if (onewire_receive_1bit()) {
+					/* no slaves */
+					return -1;
+				} else {
+					/* only slaves with 1 bits here */
+					rom[i] |= mask;
+					tx = 1;
+				}
+			} else {
+				if (onewire_receive_1bit()) {
+					/* only slaves with 0 bits here */
+					tx = 0;
+				} else {
+					/* branch point */
+					if (bit == *state) {
+						rom[i] |= mask;
+						tx = 1;
+					} else {
+						tx = rom[i] & mask;
+						if (tx == 0)
+							lastzb = bit;
+					}
+				}
+			}
+
+			onewire_transmit_1bit(tx);
+			bit++;
+		}
+	}
+
+	*state = lastzb;
+	return 0;
+}
+
+static int __attribute__((unused))
+onewire_search(unsigned char *state, unsigned char rom[8])
+{
+	if (onewire_reset())
+		return -1;
+
+	/* transmit SEARCH ROM command */
+	onewire_transmit_8bit(0xF0);
+
+	return onewire__search(state, rom);
+}
+
+static int __attribute__((unused))
+onewire_alarm_search(unsigned char *state, unsigned char rom[8])
+{
+	if (onewire_reset())
+		return -1;
+
+	/* transmit ALARM SEARCH command */
+	onewire_transmit_8bit(0xEC);
+
+	return onewire__search(state, rom);
 }

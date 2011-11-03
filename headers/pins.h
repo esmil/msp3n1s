@@ -57,7 +57,7 @@ pin_mask(double pin)
 	}
 
 #define define_pin_read(name, fname) \
-	static inline __attribute__((always_inline)) int\
+	static inline __attribute__((always_inline)) unsigned char\
 	pin_##fname(double pin)\
 	{\
 		int n = (int)(10*pin);\

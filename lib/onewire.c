@@ -21,7 +21,7 @@
 #include <delay.h>
 
 static unsigned char __attribute__((unused))
-onewire_crc_8bit(const unsigned char *message, int len)
+onewire_crc(const unsigned char *message, int len)
 {
 
 	unsigned char crc = 0;
@@ -186,7 +186,7 @@ onewire_receive_8bit(void)
 }
 
 static int __attribute__((unused))
-onewire_rom_read(unsigned char rom[8])
+onewire_read_rom(unsigned char rom[8])
 {
 	unsigned int i;
 
@@ -203,7 +203,7 @@ onewire_rom_read(unsigned char rom[8])
 }
 
 static int __attribute__((unused))
-onewire_rom_match(const unsigned char rom[8])
+onewire_match_rom(const unsigned char rom[8])
 {
 	unsigned int i;
 
@@ -220,7 +220,7 @@ onewire_rom_match(const unsigned char rom[8])
 }
 
 static int __attribute__((unused))
-onewire_rom_skip(void)
+onewire_skip_rom(void)
 {
 	if (onewire_reset())
 		return -1;
@@ -231,7 +231,7 @@ onewire_rom_skip(void)
 	return 0;
 }
 
-static int __attribute__((unused))
+static int
 onewire__search(unsigned char *state, unsigned char rom[8])
 {
 	unsigned char lastzb;
@@ -285,7 +285,7 @@ onewire__search(unsigned char *state, unsigned char rom[8])
 }
 
 static int __attribute__((unused))
-onewire_search(unsigned char *state, unsigned char rom[8])
+onewire_search_rom(unsigned char *state, unsigned char rom[8])
 {
 	if (onewire_reset())
 		return -1;

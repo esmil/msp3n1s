@@ -53,18 +53,18 @@ dtemp__scratchpad_read(unsigned char scratchpad[9])
 	for (i = 0; i < 9; i++)
 		scratchpad[i] = onewire_receive_8bit();
 
-	return onewire_crc_8bit(scratchpad, 9);
+	return onewire_crc(scratchpad, 9);
 }
 
 static int __attribute__((unused))
 dtemp_convert(unsigned char rom[8], unsigned char scratchpad[9])
 {
-	if (onewire_rom_match(rom))
+	if (onewire_match_rom(rom))
 		return -1;
 
 	dtemp__convert();
 
-	if (onewire_rom_match(rom))
+	if (onewire_match_rom(rom))
 		return -1;
 
 	return dtemp__scratchpad_read(scratchpad);
@@ -73,12 +73,12 @@ dtemp_convert(unsigned char rom[8], unsigned char scratchpad[9])
 static int __attribute__((unused))
 dtemp_convert_single(unsigned char scratchpad[9])
 {
-	if (onewire_rom_skip())
+	if (onewire_skip_rom())
 		return -1;
 
 	dtemp__convert();
 
-	if (onewire_rom_skip())
+	if (onewire_skip_rom())
 		return -1;
 
 	return dtemp__scratchpad_read(scratchpad);
@@ -159,12 +159,12 @@ main(void)
 		pin_high(LED2);
 
 		do {
-			if (onewire_search(&search_state, rom)) {
+			if (onewire_search_rom(&search_state, rom)) {
 				serial_printf("Error during search\n");
 				break;
 			}
 
-			if (onewire_crc_8bit(rom, 8)) {
+			if (onewire_crc(rom, 8)) {
 				serial_printf("Error validating ROM\n");
 				break;
 			}

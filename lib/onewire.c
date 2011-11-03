@@ -21,14 +21,13 @@
 #include <delay.h>
 
 static unsigned char __attribute__((unused))
-onewire_crc_8bit(const unsigned char message[], int len)
+onewire_crc_8bit(const unsigned char *message, int len)
 {
 
 	unsigned char crc = 0;
-	int byte;
+	unsigned char c;
 
-	for (byte = 0; byte < len; byte++) {
-		unsigned char c = message[byte];
+	for (c = *message++; len; c = *message++, len--) {
 		int i;
 
 		for (i = 0; i < 8; i++) {
@@ -95,16 +94,16 @@ onewire_reset(void)
 }
 
 static void
-onewire_transmit_8bit(unsigned int byte)
+onewire_transmit_8bit(unsigned char byte)
 {
-	unsigned int mask;
+	unsigned char mask;
 
 #ifndef ONEWIRE_INTERNAL_PULLUP
 	pin_high(ONEWIRE_PIN);
 #endif
 	pin_mode_output(ONEWIRE_PIN);
 
-	for (mask = 1; mask < 0x100; mask <<= 1) {
+	for (mask = 1; mask; mask <<= 1) {
 		if (byte & mask) {
 			pin_low(ONEWIRE_PIN);
 			pin_high(ONEWIRE_PIN);
@@ -123,10 +122,10 @@ onewire_transmit_8bit(unsigned int byte)
 #endif
 }
 
-static int
+static unsigned char
 onewire_receive_1bit(void)
 {
-	int ret;
+	unsigned char ret;
 
 	onewire_pin_low();
 	onewire_pin_release();
@@ -140,13 +139,13 @@ onewire_receive_1bit(void)
 	return ret;
 }
 
-static int
+static unsigned char
 onewire_receive_8bit(void)
 {
-	int byte = 0;
-	unsigned int mask;
+	unsigned char byte = 0;
+	unsigned char mask;
 
-	for (mask = 1; mask < 0x100; mask <<= 1) {
+	for (mask = 1; mask; mask <<= 1) {
 		onewire_pin_low();
 		onewire_pin_release();
 
@@ -164,7 +163,7 @@ onewire_receive_8bit(void)
 static int __attribute__((unused))
 onewire_rom_read(unsigned char rom[8])
 {
-	int i;
+	unsigned int i;
 
 	if (onewire_reset())
 		return -1;
@@ -181,7 +180,7 @@ onewire_rom_read(unsigned char rom[8])
 static int __attribute__((unused))
 onewire_rom_match(const unsigned char rom[8])
 {
-	int i;
+	unsigned int i;
 
 	if (onewire_reset())
 		return -1;

@@ -46,19 +46,19 @@ onewire_crc(const unsigned char *message, int len)
 static inline void
 onewire_pin_low(void)
 {
-	pin_mode_output(ONEWIRE_PIN);
 #ifdef ONEWIRE_INTERNAL_PULLUP
 	pin_low(ONEWIRE_PIN);
 #endif
+	pin_mode_output(ONEWIRE_PIN);
 }
 
 static inline void
 onewire_pin_release(void)
 {
-#ifdef ONEWIRE_INTERNAL_PULLUP
-	pin_high(ONEWIRE_PIN); /* enable internal pull-up */
-#endif
 	pin_mode_input(ONEWIRE_PIN);
+#ifdef ONEWIRE_INTERNAL_PULLUP
+	pin_high(ONEWIRE_PIN);
+#endif
 }
 
 static void
@@ -96,26 +96,16 @@ onewire_reset(void)
 static void
 onewire_transmit_1bit(unsigned char bit)
 {
-#ifndef ONEWIRE_INTERNAL_PULLUP
-	pin_high(ONEWIRE_PIN);
-#endif
-	pin_mode_output(ONEWIRE_PIN);
-
 	if (bit) {
-		pin_low(ONEWIRE_PIN);
-		pin_high(ONEWIRE_PIN);
+		onewire_pin_low();
+		onewire_pin_release();
 		delay_cycles(55);
 	} else {
-		pin_low(ONEWIRE_PIN);
-		delay_cycles(65);
-		pin_high(ONEWIRE_PIN);
+		onewire_pin_low();
+		delay_cycles(60);
+		onewire_pin_release();
 		delay_cycles(5);
 	}
-
-	pin_mode_input(ONEWIRE_PIN);
-#ifndef ONEWIRE_INTERNAL_PULLUP
-	pin_low(ONEWIRE_PIN);
-#endif
 }
 
 static void
@@ -123,28 +113,8 @@ onewire_transmit_8bit(unsigned char byte)
 {
 	unsigned char mask;
 
-#ifndef ONEWIRE_INTERNAL_PULLUP
-	pin_high(ONEWIRE_PIN);
-#endif
-	pin_mode_output(ONEWIRE_PIN);
-
-	for (mask = 1; mask; mask <<= 1) {
-		if (byte & mask) {
-			pin_low(ONEWIRE_PIN);
-			pin_high(ONEWIRE_PIN);
-			delay_cycles(55);
-		} else {
-			pin_low(ONEWIRE_PIN);
-			delay_cycles(65);
-			pin_high(ONEWIRE_PIN);
-			delay_cycles(5);
-		}
-	}
-
-	pin_mode_input(ONEWIRE_PIN);
-#ifndef ONEWIRE_INTERNAL_PULLUP
-	pin_low(ONEWIRE_PIN);
-#endif
+	for (mask = 1; mask; mask <<= 1)
+		onewire_transmit_1bit(byte & mask);
 }
 
 static unsigned char
@@ -171,15 +141,8 @@ onewire_receive_8bit(void)
 	unsigned char mask;
 
 	for (mask = 1; mask; mask <<= 1) {
-		onewire_pin_low();
-		onewire_pin_release();
-
-		delay_cycles(9);
-
-		if (pin_is_high(ONEWIRE_PIN))
+		if (onewire_receive_1bit())
 			byte |= mask;
-
-		delay_cycles(53);
 	}
 
 	return byte;

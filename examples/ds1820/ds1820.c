@@ -31,14 +31,35 @@
 /* #define ONEWIRE_INTERNAL_PULLUP */
 #include "lib/onewire.c"
 
+#define DTEMP_PARASITE_POWER
+
 static void
 dtemp__convert(void)
 {
 	/* transmit convert temperature command */
 	onewire_transmit_8bit(0x44);
 
+#ifdef DTEMP_PARASITE_POWER
+#ifdef ONEWIRE_INTERNAL_PULLUP
+/* The internal pull-up of the MSP430G2231 is around 35kOhm, but
+ * 1-Wire specifies a pull-up of 4.7kOhm, yet the internal pull-up
+ * seems to be sufficient for up to 2 or 3 DS1820s.
+ * However when the DS1820 is configured in parasite power mode
+ * the internal pull-up doesn't seem to work.
+ */
+#error "The internal pull-up doesn't work with DS1820 parasite power mode"
+#endif
+	/* enable "strong pull-up" for at least 750ms */
+	pin_high(ONEWIRE_PIN);
+	pin_mode_output(ONEWIRE_PIN);
+	for (unsigned int i = 0; i < 750; i++)
+		delay_cycles(1000);
+	pin_mode_input(ONEWIRE_PIN);
+	pin_low(ONEWIRE_PIN);
+#else
 	/* wait for conversion to complete */
 	while (onewire_receive_1bit() == 0);
+#endif
 }
 
 static int

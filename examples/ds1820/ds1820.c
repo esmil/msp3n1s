@@ -65,7 +65,7 @@ dtemp__convert(void)
 static int
 dtemp__scratchpad_read(unsigned char scratchpad[9])
 {
-	int i;
+	unsigned int i;
 
 	/* transmit read scratchpad command */
 	onewire_transmit_8bit(0xBE);

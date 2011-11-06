@@ -20,15 +20,19 @@
 #include <timera.h>
 #include <delay.h>
 
+#ifndef ONEWIRE_PIN
+#error "ONEWIRE_PIN not defined"
+#endif
+
 static unsigned char __attribute__((unused))
-onewire_crc(const unsigned char *message, int len)
+onewire_crc(const unsigned char *data, unsigned int len)
 {
 
 	unsigned char crc = 0;
 	unsigned char c;
 
-	for (c = *message++; len; c = *message++, len--) {
-		int i;
+	for (c = *data++; len; c = *data++, len--) {
+		unsigned int i;
 
 		for (i = 0; i < 8; i++) {
 			if ((crc ^ c) & 1)
@@ -197,12 +201,10 @@ onewire_skip_rom(void)
 static int
 onewire__search(unsigned char *state, unsigned char rom[8])
 {
-	unsigned char lastzb;
-	unsigned char bit;
+	unsigned char lastzb = 0;
+	unsigned char bit = 1;
 	unsigned int i;
 
-	lastzb = 0;
-	bit = 1;
 	for (i = 0; i < 8; i++) {
 		unsigned char mask;
 

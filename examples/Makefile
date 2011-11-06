@@ -1,4 +1,4 @@
-examples = blink pwm rotenc ds1820 serial nRF24L01P
+examples = blink pwm 74hc595 rotenc ds1820 serial nRF24L01P
 
 %:
 	@for i in $(examples); do\

@@ -18,12 +18,12 @@
 
 #include <pins.h>
 
-#ifndef LEFT
-#error "LEFT button not defined"
+#ifndef ROTENC_PIN_LEFT
+#error "ROTENC_PIN_LEFT button not defined"
 #endif
 
-#ifndef RIGHT
-#error "RIGHT button not defined"
+#ifndef ROTENC_PIN_RIGHT
+#error "ROTENC_PIN_RIGHT button not defined"
 #endif
 
 enum rotenc_state {
@@ -66,10 +66,10 @@ rotenc_getevent(void)
 	do {
 		unsigned int pins = 0;
 
-		if (pin_is_high(LEFT))
+		if (pin_is_high(ROTENC_PIN_LEFT))
 			pins |= 1;
 
-		if (pin_is_high(RIGHT))
+		if (pin_is_high(ROTENC_PIN_RIGHT))
 			pins |= 2;
 
 		state = rotenc_transition[state][pins];

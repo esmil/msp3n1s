@@ -24,12 +24,11 @@
 #define LED2  1.6
 #define S2    1.3
 
-#define LEFT  1.4
-#define RIGHT 1.5
-
+#define ROTENC_PIN_LEFT  1.4
+#define ROTENC_PIN_RIGHT 1.5
 #include "lib/rotenc.c"
 
-static void
+void
 watchdog_interrupt(void)
 {
 	watchdog_timer_interrupt_disable();
@@ -47,7 +46,7 @@ blink(void)
 	watchdog_timer_interrupt_enable();
 }
 
-static void
+void
 port1_interrupt(void)
 {
 	port1_interrupt_flags = 0x00;
@@ -69,17 +68,17 @@ main(void)
 	pin_low(LED2);
 
 	/* set up button bins */
-	pin_mode_input(LEFT);
-	pin_resistor_enable(LEFT);
-	pin_high(LEFT);
-	pin_interrupt_enable(LEFT);
-	pin_interrupt_falling(LEFT);
+	pin_mode_input(ROTENC_PIN_LEFT);
+	pin_resistor_enable(ROTENC_PIN_LEFT);
+	pin_high(ROTENC_PIN_LEFT);
+	pin_interrupt_enable(ROTENC_PIN_LEFT);
+	pin_interrupt_falling(ROTENC_PIN_LEFT);
 
-	pin_mode_input(RIGHT);
-	pin_resistor_enable(RIGHT);
-	pin_high(RIGHT);
-	pin_interrupt_enable(RIGHT);
-	pin_interrupt_falling(RIGHT);
+	pin_mode_input(ROTENC_PIN_RIGHT);
+	pin_resistor_enable(ROTENC_PIN_RIGHT);
+	pin_high(ROTENC_PIN_RIGHT);
+	pin_interrupt_enable(ROTENC_PIN_RIGHT);
+	pin_interrupt_falling(ROTENC_PIN_RIGHT);
 
 	pin_mode_input(S2);
 	pin_resistor_enable(S2);

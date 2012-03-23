@@ -5,6 +5,9 @@
 #NAME =
 #BASE =
 
+## If your program is split into more files specify them here
+#SOURCES = $(NAME).c
+
 ## Set the chip type here
 MCU = msp430g2231
 #MCU = msp430g2211
@@ -35,6 +38,8 @@ ifdef BASE
 CFLAGS += -iquote$(BASE) -I$(BASE)/headers
 endif
 
+SOURCES ?= $(NAME).c
+
 # Linux modules needed for serial communication with the chip on the LaunchPad
 MODULES = uhci-hcd cdc-acm ti_usb_3410_5052
 
@@ -53,7 +58,7 @@ MODE_2 = cstopb
 
 all: $(NAME).elf
 
-%.elf: %.c
+$(NAME).elf: $(SOURCES)
 	@echo '  CC/LD $@'
 	@$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 	@$(SIZE) $@ | $(SED) -ne '2s/[\t ]*[0-9]*[\t ]*[0-9]*[\t ]*[0-9]*[\t ]*\([0-9]*\).*/  \1 bytes/p'

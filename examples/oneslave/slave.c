@@ -41,11 +41,12 @@ main(void)
 	watchdog_off();
 	clock_init_1MHz();
 
-	/* set all pins to output high */
+	/* set all pins to output low */
 	port1_direction = 0xFF;
-	port1_output = 0xFF;
+	port1_output = 0x00;
 
 	pin_low(LED1);
+	pin_low(LED2);
 
 	/* initialize onewire pin */
 	pin_mode_input(OW);
@@ -66,11 +67,11 @@ main(void)
 	__eint();
 
 	while (1) {
-		unsigned int c = onewire_getcmd();
-
-		if (c & 1)
-			pin_high(LED1);
-		else
-			pin_low(LED1);
+		switch (onewire_getcmd()) {
+		case 'A': pin_high(LED1); break;
+		case 'a': pin_low(LED1); break;
+		case 'B': pin_high(LED2); break;
+		case 'b': pin_low(LED2); break;
+		}
 	}
 }

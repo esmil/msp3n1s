@@ -161,7 +161,6 @@
 
 .section .text, "ax"
 
-init:
 onewire_getcmd:
 	; BCSCTL1 = CALBC1_1MHZ + 2
 	mov.b	&__CALBC1_1MHZ,r13

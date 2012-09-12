@@ -158,15 +158,25 @@
 .global onewire_getcmd
 .global __isr_8
 .extern rom
+.extern commands
 
 .section .text, "ax"
 
+; r10 state
+; r11 scratch, mostly wait count
+; r12 bitmask
+; r13 length or one-byte input
+; r14 address
+; r15 flags/command
+
 onewire_getcmd:
+	push	r11
+	push	r10
 	; BCSCTL1 = CALBC1_1MHZ + 2
-	mov.b	&__CALBC1_1MHZ,r13
-	add.b	#2,	r13
-	mov.b	r13,	&__BCSCTL1
-	mov 	#idle,	r12
+	mov.b	&__CALBC1_1MHZ,r11
+	add.b	#2,	r11
+	mov.b	r11,	&__BCSCTL1
+	mov 	#idle,	r10
 	timera_cc1_interrupt_clear
 	timera_cc1_interrupt_enable
 	timera_off
@@ -174,34 +184,56 @@ onewire_getcmd:
 	timera_interrupt_clear
 	timera_interrupt_enable
 	LPM0
+	pop	r10
+	pop	r11
 	ret
+
+; timera_interrupt
+__isr_8:
+	add	&__TAIV,r0	; it's a jump table!
+	reti			;  0: unused
+	br	r10		;  2: TACCR1
+	reti			;  4: unused
+	reti			;  6: reserved
+	reti			;  8: reserved
+				; 10: TAIFG
+	pin_is_high 1 2
+	jnz	1f
+	timera_cc1_capture_rising
+	pin_is_high 1 2
+	jnz	2f
+	mov	#ack,	r10
+
+1:	timera_off
+	reti
+2:	timera_off
+
+ack:
+	mov	#8,	r11
+	dec	r11
+	jnz	$-2
+	pin_mode_output 1 2
+	mov	#80,	r11
+	dec	r11
+	jnz	$-2
+	timera_cc1_capture_falling
+	mov	#0,	r13
+	mov.b	#1,	r12
+	mov	#ow_cmd,r10
+	pin_mode_input 1 2
+	timera_cc1_interrupt_clear
+	reti
 
 idle:
 	timera_clear
 	timera_mode_up
 	reti
 
-ack:
-	mov	#8,r13
-	dec	r13
-	jnz	$-2
-	pin_mode_output 1 2
-	mov	#80,r13
-	dec	r13
-	jnz	$-2
-	timera_cc1_capture_falling
-	mov	#0,	r15
-	mov.b	#1,	r14
-	mov	#ow_cmd,r12
-	pin_mode_input 1 2
-	timera_cc1_interrupt_clear
-	reti
-
 sample_wait:
 	timera_clear
 	timera_mode_up
-	mov	#8,	r13
-	dec	r13
+	mov	#8,	r11
+	dec	r11
 	jnz	$-2
 	ret
 
@@ -209,80 +241,169 @@ ow_cmd:
 	call	#sample_wait
 	pin_is_high 1 2
 	jz	1f
-	bis.b	r14,	r15
+	bis.b	r12,	r13
 
-1:	rla.b	r14
+1:	rla.b	r12
 	jnz	4f
-	mov	r15,	r13
-	mov	#0,	r15
-	mov.b	#1,	r14
+
+	mov	#rom,	r14
+	mov.b	#1,	r12
 
 	; alarm search
 	;FIXME: we're always in alarm mode
 	cmp.b	#0xEC,	r13
-	jz	search_next
+	jz	search
 
 	; search rom
 	cmp.b	#0xF0,	r13
-	jz	search_next
+	jz	search
 
 	; read rom
 	cmp.b	#0x33,	r13
-	jz	read_next
-
-	; match rom
-	cmp.b	#0x55,	r13
 	jnz	2f
-	mov	#match,	r12
-	reti
+	mov	#-1,	r15
+	mov	#8,	r13
+	jmp	read_next
 
-2:	; skip rom
-	cmp.b	#0xCC,	r13
+2:	; match rom
+	cmp.b	#0x55,	r13
 	jnz	3f
-	mov	#cmd,	r12
+	mov	#8,	r13
+	mov	#match,	r10
 	reti
 
-3:	; unknown command
-	mov	#idle,	r12
-
+3:	; skip rom
+	cmp.b	#0xCC,	r13
+	jnz	sleep
+	mov	#0,	r13
+	mov	#cmd,	r10
 4:	reti
 
-cmd:
+
+search:
+	mov	#8,	r13
+
+search_next:
+	bit.b	@r14,	r12
+	jnz	1f
+
+	mov	#search01,r10
+	reti
+
+1:	mov	#search11,r10
+	reti
+
+search01:
+	pin_mode_output 1 2
+	timera_clear
+	timera_mode_up
+	; wait a few cycles
+	mov	#12,	r11
+	dec	r11
+	jnz	$-2
+
+	mov	#search02,r10
+	timera_cc1_interrupt_clear
+	pin_mode_input 1 2
+	reti
+
+search02:
+	timera_clear
+	timera_mode_up
+	mov	#search03,r10
+	reti
+
+search11:
+	timera_clear
+	timera_mode_up
+	mov	#search12,r10
+	reti
+
+search12:
+	pin_mode_output 1 2
+	timera_clear
+	timera_mode_up
+	; wait a few cycles
+	mov	#12,	r11
+	dec	r11
+	jnz	$-2
+
+	mov	#search13,r10
+	timera_cc1_interrupt_clear
+	pin_mode_input 1 2
+	reti
+
+search03:
 	call	#sample_wait
 	pin_is_high 1 2
-	jz	1f
-	bis.b	r14,	r15
+	jnz	sleep
+	jmp 	search_inc
 
-1:	rla.b	r14
-	jnz	2f
-	timera_cc1_interrupt_disable
-	timera_interrupt_disable
-	mov.b &__CALBC1_1MHZ,&__BCSCTL1
-	LPM0_EXIT
-2:	reti
+search13:
+	call	#sample_wait
+	pin_is_high 1 2
+	jz	sleep
+
+search_inc:
+	rla.b	r12
+	jnz	search_next
+	mov.b	#1,	r12
+	inc	r14
+	dec	r13
+	jnz	search_next
+	mov	#cmd,	r10
+	reti
 
 match:
 	call	#sample_wait
 	pin_is_high 1 2
 	jz	1f
 
-	bit.b	rom(r15),r14
-	jz	not_me
+	bit.b	@r14,	r12
+	jz	sleep
 	jmp	2f
 
-1:	bit.b	rom(r15),r14
-	jnz	not_me
+1:	bit.b	@r14,	r12
+	jnz	sleep
 
-2:	rla.b	r14
+2:	rla.b	r12
 	jnz	3f
-	mov.b	#1,	r14
-	inc	r15
-	cmp	#8,	r15
+	mov.b	#1,	r12
+	inc	r14
+	dec	r13
 	jnz	3f
-	mov	#0,	r15
-	mov.b	#1,	r14
-	mov	#cmd,	r12
+	mov	#cmd,	r10
 3:	reti
+
+cmd:
+	call	#sample_wait
+	pin_is_high 1 2
+	jz	1f
+	bis.b	r12,	r13
+
+1:	rla.b	r12
+	jnz	4f
+
+	mov	#commands,r11
+2:	mov	@r11+,	r15
+	cmp.b	r15,	r13
+	swpb	r15
+	jz	3f
+	bit.b	#1,	r15
+	jnz	sleep
+	add	#4,	r11
+	jmp	2b
+
+3:	mov	@r11+,	r13
+	mov.b	#1,	r12
+	cmp	#0,	r13
+	jz	cmd_done
+	mov	@r11,	r14
+	bit.b	#4,	r15
+	jz	read_next
+	mov.b	#0,	@r14
+	mov	#write,	r10
+4:	reti
 
 read1:
 	timera_clear
@@ -294,126 +415,61 @@ read0:
 	timera_clear
 	timera_mode_up
 	; wait a few cycles
-	mov	#12,	r13
-	dec	r13
+	mov	#12,	r11
+	dec	r11
 	jnz	$-2
 	timera_cc1_interrupt_clear
 	pin_mode_input 1 2
 
 read_inc:
-	rla.b	r14
+	rla.b	r12
 	jnz	read_next
-	mov.b	#1,	r14
-	inc	r15
-	cmp	#8,	r15
-	jnz	read_next
-	mov	#idle,	r12
-	reti
+	mov.b	#1,	r12
+	inc	r14
+	dec	r13
+	jz	cmd_done
 
 read_next:
-	bit.b	rom(r15),r14
+	bit.b	@r14,	r12
 	jnz	1f
 
-	mov	#read0,	r12
+	mov	#read0,	r10
 	reti
 
-1:	mov	#read1,	r12
+1:	mov	#read1,	r10
 	reti
 
-search01:
-	pin_mode_output 1 2
-	timera_clear
-	timera_mode_up
-	; wait a few cycles
-	mov	#12,	r13
-	dec	r13
-	jnz	$-2
-
-	mov	#search02,r12
-	timera_cc1_interrupt_clear
-	pin_mode_input 1 2
-	reti
-
-search02:
-	timera_clear
-	timera_mode_up
-	mov	#search03,r12
-	reti
-
-search11:
-	timera_clear
-	timera_mode_up
-	mov	#search12,r12
-	reti
-
-search12:
-	pin_mode_output 1 2
-	timera_clear
-	timera_mode_up
-	; wait a few cycles
-	mov	#12,	r13
-	dec	r13
-	jnz	$-2
-
-	mov	#search13,r12
-	timera_cc1_interrupt_clear
-	pin_mode_input 1 2
-	reti
-
-search03:
+write:
 	call	#sample_wait
 	pin_is_high 1 2
-	jnz	not_me
-	jmp 	search_inc
+	jz	1f
+	bis.b	r12,	@r14
+1:	rla.b	r12
+	jnz	2f
+	mov.b	#1,	r12
+	inc	r14
+	dec	r13
+	jz	cmd_done
+	mov.b	#0,	@r14
+2:	reti
 
-search13:
-	call	#sample_wait
-	pin_is_high 1 2
-	jz	not_me
-
-search_inc:
-	rla.b	r14
-	jnz	search_next
-	mov.b	#1,	r14
-	inc	r15
-	cmp	#8,	r15
-	jnz	search_next
-	mov	#0,	r15
-	mov.b	#1,	r14
-	mov	#cmd,	r12
-	reti
-
-search_next:
-	bit.b	rom(r15),r14
+cmd_done:
+	cmp	#-1,	r15
 	jnz	1f
-
-	mov	#search01,r12
+	mov	#cmd,	r10
 	reti
 
-1:	mov	#search11,r12
+1:	bit.b	#2,	r15
+	jz	sleep
+	swpb	r15
+	timera_cc1_interrupt_disable
+	timera_interrupt_disable
+	mov.b &__CALBC1_1MHZ,&__BCSCTL1
+	LPM0_EXIT
 	reti
 
-not_me:
-	mov	#idle,	r12
-	timera_off
-	reti
-
-; timera_interrupt
-__isr_8:
-	add	&__TAIV,r0	; it's a jump table!
-	reti			;  0: unused
-	br	r12		;  2: TACCR1
-	reti			;  4: unused
-	reti			;  6: reserved
-	reti			;  8: reserved
-				; 10: TAIFG
-	pin_is_high 1 2
-	jnz	1f
-
-	timera_cc1_capture_rising
-	mov	#ack,	r12
-
-1:	timera_off
+sleep:
+	mov	#idle,	r10
 	reti
 
 ; vim: set syntax=asm:

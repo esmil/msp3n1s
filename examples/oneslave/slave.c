@@ -29,8 +29,51 @@
 
 #define OW   1.2
 
+#define ONEWIRE_LAST   (1<<0)
+#define ONEWIRE_WAKEUP (1<<1)
+#define ONEWIRE_WRITE  (1<<2)
+
+struct onewire_command {
+	unsigned char cmd;
+	unsigned char flags;
+	unsigned int len;
+	void *data;
+};
+
 const unsigned char rom[8] = {
 	0x2D, 0x54, 0xD2, 0xEF, 0x00, 0x00, 0x00, 0x2B
+};
+
+static unsigned char buf[16] = "Hello, world!";
+
+const struct onewire_command commands[] = {
+	{
+		.cmd = 'r',
+		.len = sizeof(buf),
+		.data = buf,
+	},
+	{
+		.cmd = 'w',
+		.flags = ONEWIRE_WRITE,
+		.len = sizeof(buf),
+		.data = buf,
+	},
+	{
+		.cmd = 'A',
+		.flags = ONEWIRE_WAKEUP,
+	},
+	{
+		.cmd = 'a',
+		.flags = ONEWIRE_WAKEUP,
+	},
+	{
+		.cmd = 'B',
+		.flags = ONEWIRE_WAKEUP,
+	},
+	{
+		.cmd = 'b',
+		.flags = ONEWIRE_WAKEUP | ONEWIRE_LAST,
+	},
 };
 
 extern unsigned char onewire_getcmd(void);

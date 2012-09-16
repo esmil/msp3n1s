@@ -17,137 +17,50 @@
  */
 
 .macro timera_off
-	bic #0x30, &__TACTL
+	mov	#0,	&__TACTL
 .endm
-
-.macro timera_mode_up
-	bis #0x10, &__TACTL
+.macro timera_idle
+	mov	#0x0200,&__TACTL
 .endm
-
-.macro timera_mode_continuous
-	bis #0x20, &__TACTL
+.macro timera_reset
+	mov	#0x0216,&__TACTL
 .endm
-
-.macro timera_clear
-	bis #0x04, &__TACTL
+.macro timera_cc0_off
+	mov	#0,	&__TACCTL0
 .endm
-
-.macro timera_interrupt_clear
-	bic #0x01, &__TACTL
-.endm
-
-.macro timera_interrupt_enable
-	bis #0x02, &__TACTL
-.endm
-
-.macro timera_interrupt_disable
-	bic #0x02, &__TACTL
-.endm
-
-.macro timera_interrupt_enabled
-	bit #0x02, &__TACTL
-.endm
-
-.macro timera_cc_mode_capture n
-	bis	#0x100,	&__TACCTL\n
-.endm
-.macro timera_cc0_mode_capture
-	timera_cc_mode_capture 0
-.endm
-.macro timera_cc1_mode_capture
-	timera_cc_mode_capture 1
-.endm
-
-.macro timera_cc_mode_compare n
-	bic	#0x100,	&__TACCTL\n
-.endm
-.macro timera_cc0_mode_compare
-	timera_cc_mode_compare 0
-.endm
-.macro timera_cc1_mode_compare
-	timera_cc_mode_compare 1
-.endm
-
-.macro timera_cc_capture_rising n
-	bic	#0x8000,&__TACCTL\n
-	bis	#0x4000,&__TACCTL\n
-.endm
-.macro timera_cc0_capture_rising
-	timera_cc_capture_rising 0
+.macro timera_cc1_off
+	mov	#0,	&__TACCTL1
 .endm
 .macro timera_cc1_capture_rising
-	timera_cc_capture_rising 1
-.endm
-
-.macro timera_cc_capture_falling n
-	bis	#0x8000,&__TACCTL\n
-	bic	#0x4000,&__TACCTL\n
-.endm
-.macro timera_cc0_capture_falling
-	timera_cc_capture_falling 0
+	mov	#0x4910,&__TACCTL1
 .endm
 .macro timera_cc1_capture_falling
-	timera_cc_capture_falling 1
-.endm
-
-.macro timera_cc_interrupt_enable n
-	bis	#0x10,	&__TACCTL\n
-.endm
-.macro timera_cc0_interrupt_enable
-	timera_cc_interrupt_enable 0
-.endm
-.macro timera_cc1_interrupt_enable
-	timera_cc_interrupt_enable 1
-.endm
-
-.macro timera_cc_interrupt_disable n
-	bic	#0x10,	&__TACCTL\n
-.endm
-.macro timera_cc0_interrupt_disable
-	timera_cc_interrupt_disable 0
-.endm
-.macro timera_cc1_interrupt_disable
-	timera_cc_interrupt_disable 1
-.endm
-
-.macro timera_cc_interrupt_clear n
-	bic	#0x01,	&__TACCTL\n
-.endm
-.macro timera_cc0_interrupt_clear
-	timera_cc_interrupt_clear 0
+	mov	#0x8910,&__TACCTL1
 .endm
 .macro timera_cc1_interrupt_clear
-	timera_cc_interrupt_clear 1
+	bic	#1,	&__TACCTL1
 .endm
-
 .macro pin_high m n
 	bis.b   #(1<<\n),       &__P\m\()OUT
 .endm
-
 .macro pin_low m n
 	bic.b   #(1<<\n),       &__P\m\()OUT
 .endm
-
 .macro pin_toggle m n
 	xor.b	#(1<<\n),	&__P\m\()OUT
 .endm
-
 .macro pin_mode_output m n
 	bis.b	#(1<<\n),	&__P\m\()DIR
 .endm
-
 .macro pin_mode_input m n
 	bic.b	#(1<<\n),	&__P\m\()DIR
 .endm
-
 .macro pin_is_high m n
 	bit.b	#(1<<\n),	&__P\m\()IN
 .endm
-
 .macro pin_function_primary m n
 	bis.b	#(1<<\n),	&__P\m\()SEL
 .endm
-
 .macro LPM0
 	bis	#16,	r2
 .endm
@@ -172,17 +85,17 @@
 onewire_getcmd:
 	push	r11
 	push	r10
+	timera_cc0_off
+	timera_cc1_off
+	timera_off
 	; BCSCTL1 = CALBC1_1MHZ + 2
 	mov.b	&__CALBC1_1MHZ,r11
 	add.b	#2,	r11
 	mov.b	r11,	&__BCSCTL1
-	mov 	#idle,	r10
-	timera_cc1_interrupt_clear
-	timera_cc1_interrupt_enable
-	timera_off
 	mov 	#900,	&__TACCR0
-	timera_interrupt_clear
-	timera_interrupt_enable
+	mov 	#idle,	r10
+	timera_cc1_capture_falling
+	timera_idle
 	LPM0
 	mov.b	&__CALBC1_1MHZ,&__BCSCTL1
 	pop	r10
@@ -199,40 +112,35 @@ __isr_8:
 	reti			;  8: reserved
 				; 10: TAIFG
 	pin_is_high 1 2
+	timera_idle
 	jnz	1f
 	timera_cc1_capture_rising
 	pin_is_high 1 2
-	jnz	2f
+	jnz	ack
 	mov	#ack,	r10
-
-1:	timera_off
-	reti
-2:	timera_off
+1:	reti
 
 ack:
 	mov	#8,	r11
 	dec	r11
 	jnz	$-2
 	pin_mode_output 1 2
-	mov	#80,	r11
+	mov	#91,	r11
 	dec	r11
 	jnz	$-2
-	timera_cc1_capture_falling
 	mov	#0,	r13
 	mov.b	#1,	r12
 	mov	#ow_cmd,r10
+	timera_cc1_capture_falling
 	pin_mode_input 1 2
-	timera_cc1_interrupt_clear
 	reti
 
 idle:
-	timera_clear
-	timera_mode_up
+	timera_reset
 	reti
 
 sample_wait:
-	timera_clear
-	timera_mode_up
+	timera_reset
 	mov	#8,	r11
 	dec	r11
 	jnz	$-2
@@ -296,39 +204,33 @@ search_next:
 
 search01:
 	pin_mode_output 1 2
-	timera_clear
-	timera_mode_up
+	timera_reset
 	; wait a few cycles
 	mov	#12,	r11
 	dec	r11
 	jnz	$-2
-
 	mov	#search02,r10
 	timera_cc1_interrupt_clear
 	pin_mode_input 1 2
 	reti
 
 search02:
-	timera_clear
-	timera_mode_up
+	timera_reset
 	mov	#search03,r10
 	reti
 
 search11:
-	timera_clear
-	timera_mode_up
+	timera_reset
 	mov	#search12,r10
 	reti
 
 search12:
 	pin_mode_output 1 2
-	timera_clear
-	timera_mode_up
+	timera_reset
 	; wait a few cycles
 	mov	#12,	r11
 	dec	r11
 	jnz	$-2
-
 	mov	#search13,r10
 	timera_cc1_interrupt_clear
 	pin_mode_input 1 2
@@ -407,14 +309,12 @@ cmd:
 4:	reti
 
 read1:
-	timera_clear
-	timera_mode_up
+	timera_reset
 	jmp	read_inc
 
 read0:
 	pin_mode_output 1 2
-	timera_clear
-	timera_mode_up
+	timera_reset
 	; wait a few cycles
 	mov	#12,	r11
 	dec	r11
@@ -460,8 +360,8 @@ cmd_done:
 	cmp	#-1,	r15
 	jz	get_cmd
 	swpb	r15
-	timera_cc1_interrupt_disable
-	timera_interrupt_disable
+	timera_cc1_off
+	timera_off
 	LPM0_EXIT
 	reti
 

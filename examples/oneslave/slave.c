@@ -98,16 +98,6 @@ main(void)
 	pin_low(OW);
 	pin_function_primary(OW);
 
-	/* initialize timera */
-	timera_clock_source_smclk();
-	timera_clock_divide(1);
-	timera_off();
-	timera_cc1_input_a();
-	timera_cc1_capture_sync();
-	timera_cc1_capture_falling();
-	timera_cc1_mode_capture();
-	timera_clear();
-
 	/* enable interrupts */
 	__eint();
 

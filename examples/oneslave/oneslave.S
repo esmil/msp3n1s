@@ -184,6 +184,7 @@ onewire_getcmd:
 	timera_interrupt_clear
 	timera_interrupt_enable
 	LPM0
+	mov.b	&__CALBC1_1MHZ,&__BCSCTL1
 	pop	r10
 	pop	r11
 	ret
@@ -351,6 +352,7 @@ search_inc:
 	inc	r14
 	dec	r13
 	jnz	search_next
+get_cmd:
 	mov	#cmd,	r10
 	reti
 
@@ -371,8 +373,7 @@ match:
 	mov.b	#1,	r12
 	inc	r14
 	dec	r13
-	jnz	3f
-	mov	#cmd,	r10
+	jz	get_cmd
 3:	reti
 
 cmd:
@@ -454,17 +455,13 @@ write:
 2:	reti
 
 cmd_done:
-	cmp	#-1,	r15
-	jnz	1f
-	mov	#cmd,	r10
-	reti
-
-1:	bit.b	#2,	r15
+	bit.b	#2,	r15
 	jz	sleep
+	cmp	#-1,	r15
+	jz	get_cmd
 	swpb	r15
 	timera_cc1_interrupt_disable
 	timera_interrupt_disable
-	mov.b &__CALBC1_1MHZ,&__BCSCTL1
 	LPM0_EXIT
 	reti
 

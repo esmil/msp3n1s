@@ -72,6 +72,7 @@
 .global __isr_8
 .extern rom
 .extern commands
+.extern alarm
 
 .section .text, "ax"
 
@@ -159,9 +160,8 @@ ow_cmd:
 	mov.b	#1,	r12
 
 	; alarm search
-	;FIXME: we're always in alarm mode
 	cmp.b	#0xEC,	r13
-	jz	search
+	jz	search_alarm
 
 	; search rom
 	cmp.b	#0xF0,	r13
@@ -188,6 +188,10 @@ ow_cmd:
 	mov	#cmd,	r10
 4:	reti
 
+
+search_alarm:
+	cmp.b	#0,	&alarm
+	jz	sleep
 
 search:
 	mov	#8,	r13

@@ -59,6 +59,10 @@ const struct onewire_command commands[] = {
 		.data = buf,
 	},
 	{
+		.cmd = 'x',
+		.flags = ONEWIRE_WAKEUP,
+	},
+	{
 		.cmd = 'A',
 		.flags = ONEWIRE_WAKEUP,
 	},
@@ -76,6 +80,16 @@ const struct onewire_command commands[] = {
 	},
 };
 
+unsigned char alarm;
+
+void
+port1_interrupt(void)
+{
+	/* enter alarm mode and disable button irq */
+	alarm = 1;
+	pin_interrupt_disable(S2);
+}
+
 extern unsigned char onewire_getcmd(void);
 
 int
@@ -90,13 +104,21 @@ main(void)
 	port2_direction = 0xFF;
 	port2_output = 0xFF;
 
-	pin_low(LED1);
-	pin_low(LED2);
-
 	/* initialize onewire pin */
 	pin_mode_input(OW);
 	pin_low(OW);
 	pin_function_primary(OW);
+
+	/* initialize button pin */
+	pin_mode_input(S2);
+	pin_resistor_enable(S2);
+	pin_interrupt_falling(S2);
+	pin_interrupt_clear(S2);
+	pin_interrupt_enable(S2);
+
+	/* switch off LEDs */
+	pin_low(LED1);
+	pin_low(LED2);
 
 	/* enable interrupts */
 	__eint();
@@ -107,6 +129,12 @@ main(void)
 		case 'a': pin_low(LED1); break;
 		case 'B': pin_high(LED2); break;
 		case 'b': pin_low(LED2); break;
+		case 'x':
+			  /* disable alarm mode and enable button irq */
+			  alarm = 0;
+			  pin_interrupt_clear(S2);
+			  pin_interrupt_enable(S2);
+			  break;
 		}
 	}
 }

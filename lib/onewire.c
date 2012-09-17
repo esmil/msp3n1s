@@ -27,11 +27,10 @@
 static unsigned char __attribute__((unused))
 onewire_crc(const unsigned char *data, unsigned int len)
 {
-
 	unsigned char crc = 0;
-	unsigned char c;
 
-	for (c = *data++; len; c = *data++, len--) {
+	for (; len; len--) {
+		unsigned char c = *data++;
 		unsigned int i;
 
 		for (i = 0; i < 8; i++) {

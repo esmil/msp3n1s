@@ -70,9 +70,9 @@
 
 .global onewire_getcmd
 .global __isr_8
-.extern rom
-.extern commands
-.extern alarm
+.extern onewire_rom
+.extern onewire_commands
+.extern onewire_alarm
 
 .section .text, "ax"
 
@@ -80,7 +80,7 @@
 ; r11 scratch, mostly wait count
 ; r12 bitmask
 ; r13 length or one-byte input
-; r14 address
+; r14 memory address
 ; r15 flags/command
 
 onewire_getcmd:
@@ -156,7 +156,7 @@ ow_cmd:
 1:	rla.b	r12
 	jnz	4f
 
-	mov	#rom,	r14
+	mov	#onewire_rom,r14
 	mov.b	#1,	r12
 
 	; alarm search
@@ -190,7 +190,7 @@ ow_cmd:
 
 
 search_alarm:
-	cmp.b	#0,	&alarm
+	cmp.b	#0,	&onewire_alarm
 	jz	sleep
 
 search:
@@ -291,7 +291,7 @@ cmd:
 1:	rla.b	r12
 	jnz	4f
 
-	mov	#commands,r11
+	mov	#onewire_commands,r11
 2:	mov	@r11+,	r15
 	cmp.b	r15,	r13
 	swpb	r15

@@ -20,33 +20,20 @@
 #include <watchdog.h>
 #include <clock.h>
 #include <pins.h>
-#include <timera.h>
-#include <usi.h>
+
+#include "lib/oneslave.h"
 
 #define LED1 1.0
 #define LED2 1.6
 #define S2   1.3
 
-#define OW   1.2
+static unsigned char buf[16] = "Hello, world!";
 
-#define ONEWIRE_LAST   (1<<0)
-#define ONEWIRE_WAKEUP (1<<1)
-#define ONEWIRE_WRITE  (1<<2)
-
-struct onewire_command {
-	unsigned char cmd;
-	unsigned char flags;
-	unsigned int len;
-	void *data;
-};
-
-const unsigned char rom[8] = {
+const unsigned char onewire_rom[8] = {
 	0x2D, 0x54, 0xD2, 0xEF, 0x00, 0x00, 0x00, 0x2B
 };
 
-static unsigned char buf[16] = "Hello, world!";
-
-const struct onewire_command commands[] = {
+const struct onewire_command onewire_commands[] = {
 	{
 		.cmd = 'r',
 		.len = sizeof(buf),
@@ -80,17 +67,15 @@ const struct onewire_command commands[] = {
 	},
 };
 
-unsigned char alarm;
+unsigned char onewire_alarm;
 
 void
 port1_interrupt(void)
 {
 	/* enter alarm mode and disable button irq */
-	alarm = 1;
+	onewire_alarm = 1;
 	pin_interrupt_disable(S2);
 }
-
-extern unsigned char onewire_getcmd(void);
 
 int
 main(void)
@@ -105,9 +90,9 @@ main(void)
 	port2_output = 0xFF;
 
 	/* initialize onewire pin */
-	pin_mode_input(OW);
-	pin_low(OW);
-	pin_function_primary(OW);
+	pin_mode_input(ONESLAVE_PIN);
+	pin_low(ONESLAVE_PIN);
+	pin_function_primary(ONESLAVE_PIN);
 
 	/* initialize button pin */
 	pin_mode_input(S2);
@@ -130,8 +115,9 @@ main(void)
 		case 'B': pin_high(LED2); break;
 		case 'b': pin_low(LED2); break;
 		case 'x':
-			  /* disable alarm mode and enable button irq */
-			  alarm = 0;
+			  /* disable alarm mode */
+			  onewire_alarm = 0;
+			  /* ..and re-enable button irq */
 			  pin_interrupt_clear(S2);
 			  pin_interrupt_enable(S2);
 			  break;

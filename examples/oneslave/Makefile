@@ -1,6 +1,6 @@
 NAME = slave
 BASE = ../..
 
-SOURCES = oneslave.S slave.c
+SOURCES = $(BASE)/lib/oneslave.S slave.c
 
 include $(BASE)/Makefile

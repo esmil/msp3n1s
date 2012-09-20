@@ -1,4 +1,6 @@
-examples = blink pwm 74hc595 74hc166 rotenc ds1820 serial nRF24L01P oneslave
+examples = blink pwm 74hc595 74hc166 rotenc ds1820 serial nRF24L01P oneslave lcd
+
+all:
 
 %:
 	@for i in $(examples); do\

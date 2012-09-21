@@ -38,31 +38,6 @@ lcd_pulse(void)
 }
 
 static void
-lcd_send(unsigned char c)
-{
-	__bic_b(P1OUT, 0xF0);
-	__bis_b(P1OUT, c & 0xF0);
-	lcd_pulse();
-	__bic_b(P1OUT, 0xF0);
-	__bis_b(P1OUT, c << 4);
-	lcd_pulse();
-}
-
-static void
-lcd_command(unsigned char command)
-{
-	pin_low(LCD_RS);
-	lcd_send(command);
-}
-
-static void
-lcd_putchar(unsigned char c)
-{
-	pin_high(LCD_RS);
-	lcd_send(c);
-}
-
-static void
 lcd_sync(void)
 {
 	/* make sure we are in 8-bit mode */
@@ -90,6 +65,24 @@ lcd_init(void)
 	lcd_sync();
 }
 
+static void
+lcd_send(unsigned char c)
+{
+	__bic_b(P1OUT, 0xF0);
+	__bis_b(P1OUT, c & 0xF0);
+	lcd_pulse();
+	__bic_b(P1OUT, 0xF0);
+	__bis_b(P1OUT, c << 4);
+	lcd_pulse();
+}
+
+static void
+lcd_command(unsigned char command)
+{
+	pin_low(LCD_RS);
+	lcd_send(command);
+}
+
 static void __attribute__((unused))
 lcd_clear(void)
 {
@@ -111,10 +104,18 @@ lcd_cursor_set(unsigned char pos)
 }
 
 static void __attribute__((unused))
+lcd_putchar(unsigned char c)
+{
+	pin_high(LCD_RS);
+	lcd_send(c);
+}
+
+static void __attribute__((unused))
 lcd_puts(const char *str)
 {
 	unsigned char c;
 
-	for (; (c = *str) != '\0'; str++)
-		lcd_putchar(c);
+	pin_high(LCD_RS);
+	while ((c = *str++) != '\0')
+		lcd_send(c);
 }

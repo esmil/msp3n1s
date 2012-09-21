@@ -209,33 +209,29 @@ search_next:
 search01:
 	pin_mode_output 1 2
 	timera_reset
-	; wait a few cycles
-	mov	#12,	r11
-	dec	r11
-	jnz	$-2
 	mov	#search02,r10
-	timera_cc1_interrupt_clear
-	pin_mode_input 1 2
-	reti
+	jmp	search_tail
 
 search02:
 	timera_reset
 	mov	#search03,r10
-	reti
+	jmp	search_tail
 
 search11:
 	timera_reset
 	mov	#search12,r10
-	reti
+	jmp	search_tail
 
 search12:
 	pin_mode_output 1 2
 	timera_reset
-	; wait a few cycles
-	mov	#12,	r11
+	mov	#search13,r10
+	nop
+
+search_tail:
+	mov	#8,	r11
 	dec	r11
 	jnz	$-2
-	mov	#search13,r10
 	timera_cc1_interrupt_clear
 	pin_mode_input 1 2
 	reti
@@ -319,8 +315,7 @@ read1:
 read0:
 	pin_mode_output 1 2
 	timera_reset
-	; wait a few cycles
-	mov	#12,	r11
+	mov	#8,	r11
 	dec	r11
 	jnz	$-2
 	timera_cc1_interrupt_clear

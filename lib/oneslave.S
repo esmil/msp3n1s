@@ -25,49 +25,49 @@
 #endif
 
 .macro timera_off
-	mov	#0,	&__TACTL
+	mov	#0,	&TACTL
 .endm
 .macro timera_idle
-	mov	#0x0200,&__TACTL
+	mov	#0x0200,&TACTL
 .endm
 .macro timera_reset
-	mov	#0x0216,&__TACTL
+	mov	#0x0216,&TACTL
 .endm
 .macro timera_cc0_off
-	mov	#0,	&__TACCTL0
+	mov	#0,	&TACCTL0
 .endm
 .macro timera_cc1_off
-	mov	#0,	&__TACCTL1
+	mov	#0,	&TACCTL1
 .endm
 .macro timera_cc1_capture_rising
-	mov	#0x4910,&__TACCTL1
+	mov	#0x4910,&TACCTL1
 .endm
 .macro timera_cc1_capture_falling
-	mov	#0x8910,&__TACCTL1
+	mov	#0x8910,&TACCTL1
 .endm
 .macro timera_cc1_interrupt_clear
-	bic	#1,	&__TACCTL1
+	bic	#1,	&TACCTL1
 .endm
 .macro pin_high m n
-	bis.b   #(1<<\n),       &__P\m\()OUT
+	bis.b   #(1<<\n),       &P\m\()OUT
 .endm
 .macro pin_low m n
-	bic.b   #(1<<\n),       &__P\m\()OUT
+	bic.b   #(1<<\n),       &P\m\()OUT
 .endm
 .macro pin_toggle m n
-	xor.b	#(1<<\n),	&__P\m\()OUT
+	xor.b	#(1<<\n),	&P\m\()OUT
 .endm
 .macro pin_mode_output m n
-	bis.b	#(1<<\n),	&__P\m\()DIR
+	bis.b	#(1<<\n),	&P\m\()DIR
 .endm
 .macro pin_mode_input m n
-	bic.b	#(1<<\n),	&__P\m\()DIR
+	bic.b	#(1<<\n),	&P\m\()DIR
 .endm
 .macro pin_is_high m n
-	bit.b	#(1<<\n),	&__P\m\()IN
+	bit.b	#(1<<\n),	&P\m\()IN
 .endm
 .macro pin_function_primary m n
-	bis.b	#(1<<\n),	&__P\m\()SEL
+	bis.b	#(1<<\n),	&P\m\()SEL
 .endm
 
 .global onewire_getcmd
@@ -92,22 +92,22 @@ onewire_getcmd:
 	timera_cc1_off
 	timera_off
 	; BCSCTL1 = CALBC1_1MHZ + 2
-	mov.b	&__CALBC1_1MHZ,r11
+	mov.b	&CALBC1_1MHZ,r11
 	add.b	#2,	r11
-	mov.b	r11,	&__BCSCTL1
-	mov 	#900,	&__TACCR0
+	mov.b	r11,	&BCSCTL1
+	mov 	#900,	&TACCR0
 	mov 	#idle,	r10
 	timera_cc1_capture_falling
 	timera_idle
 	bis	#LPM0,	r2
-	mov.b	&__CALBC1_1MHZ,&__BCSCTL1
+	mov.b	&CALBC1_1MHZ,&BCSCTL1
 	pop	r10
 	pop	r11
 	ret
 
 ; timera_interrupt
 __isr_8:
-	add	&__TAIV,r0	; it's a jump table!
+	add	&TAIV,	r0	; it's a jump table!
 	reti			;  0: unused
 	br	r10		;  2: TACCR1
 	reti			;  4: unused

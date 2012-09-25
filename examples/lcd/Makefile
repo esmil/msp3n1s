@@ -1,4 +1,4 @@
-NAME = test
+NAME = lcd
 BASE = ../..
 
 include $(BASE)/Makefile

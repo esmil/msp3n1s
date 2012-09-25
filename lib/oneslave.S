@@ -16,6 +16,14 @@
  * along with msp3n1s.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <msp430.h>
+
+/* Workaround for TI header bug */
+#ifdef LPM0_bits
+#undef LPM0
+#define LPM0 LPM0_bits
+#endif
+
 .macro timera_off
 	mov	#0,	&__TACTL
 .endm
@@ -61,12 +69,6 @@
 .macro pin_function_primary m n
 	bis.b	#(1<<\n),	&__P\m\()SEL
 .endm
-.macro LPM0
-	bis	#16,	r2
-.endm
-.macro LPM0_EXIT
-	bic	#16,	0(r1)
-.endm
 
 .global onewire_getcmd
 .global __isr_8
@@ -97,7 +99,7 @@ onewire_getcmd:
 	mov 	#idle,	r10
 	timera_cc1_capture_falling
 	timera_idle
-	LPM0
+	bis	#LPM0,	r2
 	mov.b	&__CALBC1_1MHZ,&__BCSCTL1
 	pop	r10
 	pop	r11
@@ -361,7 +363,7 @@ cmd_done:
 	swpb	r15
 	timera_cc1_off
 	timera_off
-	LPM0_EXIT
+	bic	#LPM0,	0(r1)
 	reti
 
 sleep:

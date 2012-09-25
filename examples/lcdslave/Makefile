@@ -1,6 +1,6 @@
-NAME = slave
+NAME = lcdslave
 BASE = ../..
 
-SOURCES = $(BASE)/lib/oneslave.S slave.c
+SOURCES = $(BASE)/lib/oneslave.S lcdslave.c
 
 include $(BASE)/Makefile

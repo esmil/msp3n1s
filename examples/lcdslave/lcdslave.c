@@ -126,6 +126,7 @@ main(void)
 
 		case 's':
 			lcd_sync();
+			lcd_command(0x28); /* 2 lines, 5x8 dot font */
 			break;
 
 		case 'x':

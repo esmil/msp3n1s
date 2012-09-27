@@ -29,7 +29,7 @@ static struct {
 } serial_input;
 
 void
-timera_cc1_interrupt(void)
+timera_interrupt(void)
 {
 	static unsigned char mask;
 	static unsigned char byte;

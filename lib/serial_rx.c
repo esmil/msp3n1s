@@ -21,7 +21,7 @@
 static volatile int serial_rxbyte = -1;
 
 void
-timera_cc1_interrupt(void)
+timera_interrupt(void)
 {
 	static unsigned char mask;
 	static unsigned char byte;

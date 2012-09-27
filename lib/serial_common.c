@@ -33,9 +33,7 @@
 static void
 serial_init_clock(void)
 {
-	timera_clock_source_smclk();
-	timera_clock_divide(1);
-	timera_mode_continuous();
+	timera_config(TIMERA_CLOCK_SMCLK | TIMERA_MODE_CONTINUOUS);
 }
 
 #endif

@@ -22,7 +22,52 @@
 #include <msp430.h>
 #include <macros.h>
 
+#define TIMERA_CLOCK_TACLK        (0x0000)
+#define TIMERA_CLOCK_ACLK         (0x0100)
+#define TIMERA_CLOCK_SMCLK        (0x0200)
+#define TIMERA_CLOCK_INCLK        (0x0300)
+#define TIMERA_CLOCK_DIV1         (0x0000)
+#define TIMERA_CLOCK_DIV2         (0x0040)
+#define TIMERA_CLOCK_DIV4         (0x0080)
+#define TIMERA_CLOCK_DIV8         (0x00C0)
+#define TIMERA_MODE_STOP          (0x0000)
+#define TIMERA_MODE_UP            (0x0010)
+#define TIMERA_MODE_CONTINUOUS    (0x0020)
+#define TIMERA_MODE_UPDOWN        (0x0030)
+#define TIMERA_CLEAR              (0x0004)
+#define TIMERA_INTERRUPT_DISABLE  (0x0000)
+#define TIMERA_INTERRUPT_ENABLE   (0x0002)
+#define TIMERA_INTERRUPT_FLAG     (0x0001)
+
+#define TIMERA_CC_CAPTURE_NONE       (0x0100)
+#define TIMERA_CC_CAPTURE_RISING     (0x4100)
+#define TIMERA_CC_CAPTURE_FALLING    (0x8100)
+#define TIMERA_CC_CAPTURE_BOTH       (0xC100)
+#define TIMERA_CC_INPUT_A            (0x0000)
+#define TIMERA_CC_INPUT_B            (0x1000)
+#define TIMERA_CC_INPUT_GND          (0x2000)
+#define TIMERA_CC_INPUT_VCC          (0x3000)
+#define TIMERA_CC_CAPTURE_ASYNC      (0x0000)
+#define TIMERA_CC_CAPTURE_SYNC       (0x0800)
+#define TIMERA_CC_OUTPUT_BIT         (0x0000)
+#define TIMERA_CC_OUTPUT_SET         (0x0020)
+#define TIMERA_CC_OUTPUT_TOGGLERESET (0x0040)
+#define TIMERA_CC_OUTPUT_SETRESET    (0x0060)
+#define TIMERA_CC_OUTPUT_TOGGLE      (0x0080)
+#define TIMERA_CC_OUTPUT_RESET       (0x00A0)
+#define TIMERA_CC_OUTPUT_TOGGLESET   (0x00C0)
+#define TIMERA_CC_OUTPUT_RESETSET    (0x00E0)
+#define TIMERA_CC_INTERRUPT_ENABLE   (0x0010)
+#define TIMERA_CC_INTERRUPT_DISABLE  (0x0000)
+#define TIMERA_CC_OUTPUT_HIGH        (0x0004)
+#define TIMERA_CC_OUTPUT_LOW         (0x0000)
+#define TIMERA_CC_INTERRUPT_FLAG     (0x0001)
+
 #define define_control(prefix, reg)\
+	static inline void\
+	prefix##_config(unsigned int c)   { reg = c; }\
+	static inline void\
+	prefix##_off(void)                { reg = 0; }\
 	static inline void\
 	prefix##_clock_source_taclk(void) { __bic_w(reg, TASSEL1 | TASSEL0); }\
 	static inline void\
@@ -75,6 +120,10 @@
 	prefix##_interrupt_flag(void)    { return reg & TAIFG; }
 
 #define define_capture_compare(prefix, reg)\
+	static inline void\
+	prefix##_config(unsigned int c)  { reg = c; }\
+	static inline void\
+	prefix##_off(void)               { reg = 0; }\
 	static inline void\
 	prefix##_capture_none(void)      { __bic_w(reg, CM1 | CM0); }\
 	static inline void\

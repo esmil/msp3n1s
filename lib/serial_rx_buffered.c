@@ -88,9 +88,9 @@ serial_init_rx(void)
 	pin_mode_input(SERIAL_RX);
 	pin_function_primary(SERIAL_RX);
 
-	timera_cc1_capture_falling();
-	timera_cc1_input_a();
-	timera_cc1_capture_sync();
-	timera_cc1_mode_capture();
-	timera_cc1_interrupt_enable();
+	timera_cc1_config(
+			TIMERA_CC_CAPTURE_FALLING |
+			TIMERA_CC_CAPTURE_SYNC |
+			TIMERA_CC_INPUT_A |
+			TIMERA_CC_INTERRUPT_ENABLE);
 }

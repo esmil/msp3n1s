@@ -221,6 +221,5 @@ serial_init_tx(void)
 	pin_mode_output(SERIAL_TX);
 	pin_function_primary(SERIAL_TX);
 	/* set TX high when idle */
-	timera_cc0_output_high();
-	timera_cc0_output_mode(1);
+	timera_cc0_config(TIMERA_CC_OUTPUT_HIGH | TIMERA_CC_OUTPUT_SET);
 }

@@ -37,21 +37,18 @@ main(void)
 
 	pin_low(LED1);
 
-	timera_cc1_mode_compare();
 	pin_function_primary(LED2);
 	/* set capture/compare module 1 in reset/set output mode,
 	 * that is:
 	 *   pin 1.6 is set high when timera_count == timera_cc0
 	 *   pin 1.6 is set low  when timera_count == timera_cc1
 	 */
-	timera_cc1_output_mode(7);
+	timera_cc1_config(TIMERA_CC_OUTPUT_RESETSET);
 
-	/* use the system clock as timer source */
-	timera_clock_source_smclk();
-	/* divde the timer by 1, that is run as fast as source */
-	timera_clock_divide(1);
-	/* count from 0 up to timera_cc0 before resetting the counter */
-	timera_mode_up();
+	/* use the system clock as timer source,
+	 * count from 0 up to timera_cc0 before resetting the counter,
+	 * and reset the counter now */
+	timera_config(TIMERA_CLOCK_SMCLK | TIMERA_MODE_UP | TIMERA_CLEAR);
 
 	/* count from 0 to 1024, that is a frequency of
 	 * 1 MHz / 1024 = just under 1kHz. */

@@ -16,6 +16,9 @@
  * along with msp3n1s.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <pins.h>
+#include <delay.h>
+
 #ifndef LCD_RS
 #error "LCD_RS not defined"
 #endif

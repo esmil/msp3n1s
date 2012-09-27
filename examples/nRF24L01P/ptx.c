@@ -20,7 +20,6 @@
 #include <watchdog.h>
 #include <clock.h>
 #include <pins.h>
-#include <delay.h>
 #include <usi.h>
 
 #define CE   1.0

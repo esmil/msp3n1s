@@ -20,7 +20,6 @@
 #include <watchdog.h>
 #include <clock.h>
 #include <pins.h>
-#include <delay.h>
 
 #define S2 1.3
 

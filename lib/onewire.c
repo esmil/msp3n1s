@@ -17,7 +17,6 @@
  */
 
 #include <pins.h>
-#include <timera.h>
 #include <delay.h>
 
 #ifndef ONEWIRE_PIN
